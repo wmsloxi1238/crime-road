@@ -63,6 +63,30 @@
   footer{font-size:12px;color:#64748b;line-height:1.7;padding-bottom:8px}
   .note{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.25);border-radius:14px;padding:14px 16px;font-size:13px;color:#bfdbfe}
   .note b{color:#fff}
+  .trust{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#86efac;
+    background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:9px 14px;margin-top:14px}
+  .trust b{color:#dcfce7}
+  .deces{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:820px){.deces{grid-template-columns:repeat(2,1fr)}}
+  .dec{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--orange);border-radius:14px;padding:16px}
+  .dec .top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .dec .tel{font-size:11px;font-weight:800;color:#0f172a;background:var(--orange);border-radius:6px;padding:2px 7px}
+  .dec .job{font-size:14px;font-weight:700;color:#fff}
+  .dec .ev{font-size:12.5px;color:#cbd5e1;margin:2px 0 6px}
+  .dec .ev b{color:#fdba74}
+  .dec .arrow{font-size:12.5px;color:#94a3b8}
+  .dec .arrow b{color:#86efac}
+  .tri{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:16px}
+  @media(min-width:680px){.tri{grid-template-columns:repeat(3,1fr)}}
+  .tri .t{background:rgba(15,23,42,.5);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .tri .t .h{font-size:12px;font-weight:700;color:var(--orange);margin-bottom:3px}
+  .tri .t .b{font-size:12.5px;color:#cbd5e1}
+  .road{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .road li{display:flex;gap:10px;font-size:13px;color:#cbd5e1;align-items:baseline}
+  .road .n{flex:none;width:20px;height:20px;border-radius:6px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.5);
+    color:#d8b4fe;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+  .road b{color:#fff}
+  .muted-sec .card{opacity:.82}
   @media(max-width:560px){
     h1{font-size:26px}.hero{padding:24px 18px}.wrap{padding:16px 12px 40px;gap:16px}
     .hl .big{font-size:24px}.kpi .v{font-size:24px}.mapwrap{height:320px}
@@ -73,19 +97,45 @@
 <div class="wrap">
 
   <header class="hero">
-    <div class="tag"><span class="dot"></span> 강남구 생활안전 데이터 대시보드</div>
-    <h1>강남구는 지금, 안전한가?</h1>
-    <p class="lead">2024년 서울 강남구의 <b>5대범죄·주정차 단속·가로등</b> 공공데이터를 한 화면에 모았습니다. 강남구 단위로 공개된 수치만 사용했습니다.</p>
+    <div class="tag"><span class="dot"></span> 복지생활국 가족정책과 · 가족정책팀 여성안전</div>
+    <h1>여성안심 사업, 어디에·왜·얼마로</h1>
+    <p class="lead">한국은 개별 범죄의 좌표를 공개하지 않아 ‘위험한 골목’을 직접 알 수 없습니다. 이 보드는 흩어진 경찰·구청 공개데이터를 <b>교차검증·통합</b>해, <b>여성안심길·안심망·1인가구 안심·성폭력 예방</b> 사업의 입지·예산 근거로 번역합니다.</p>
     <div class="hl">
-      <span class="s">5대범죄 발생</span>
+      <span class="s">성범죄(강간·강제추행)</span>
       <span class="big" id="heroCrime"></span>
       <span class="s" id="heroRate"></span>
     </div>
+    <div class="trust">✓ <span><b>교차검증 완료</b> — 강남구 치안통계 = 강남·수서경찰서 관할 합 = 강력범죄 합 (의회·예산에서 반박되지 않는 단일 근거)</span></div>
   </header>
 
   <div class="insight" id="insight"></div>
 
   <div class="kpis" id="kpis"></div>
+
+  <!-- ===== 담당자별 의사결정 지원 ===== -->
+  <div class="sec-title"><h3>담당자별 의사결정 지원 — 가족정책팀 여성안전 4인</h3><span class="ln"></span></div>
+  <div class="deces">
+    <div class="dec">
+      <div class="top"><span class="tel">☎ 5838</span><span class="job">여성안심길·안심계단·환경개선</span></div>
+      <div class="ev">근거: 가로등 사각 × 성범죄 규모 — 가로등 <b id="m_lamp"></b> · 성범죄 <b id="m_sex"></b></div>
+      <div class="arrow">→ 조명·계단 개선 <b>후보지·예산</b> 산출 (CPTED)</div>
+    </div>
+    <div class="dec">
+      <div class="top"><span class="tel">☎ 5839</span><span class="job">여성친화도시·24시간 안심망·예방교육</span></div>
+      <div class="ev">근거: 강간·강제추행 규모·검거율 — <b id="m_sex2"></b> · 검거율 <b id="m_sexrate"></b></div>
+      <div class="arrow">→ 안심망 배치·교육 타깃·<b>캠페인 시점</b></div>
+    </div>
+    <div class="dec">
+      <div class="top"><span class="tel">☎ 5814</span><span class="job">1인가구 안심(택배함·지킴이집)·홈방범</span></div>
+      <div class="ev">근거: 절도 발생·낮은 검거율 — 절도 <b id="m_theft"></b> · 검거율 <b id="m_theftrate"></b></div>
+      <div class="arrow">→ 방범기기 <b>대상·확대 명분</b></div>
+    </div>
+    <div class="dec">
+      <div class="top"><span class="tel">☎ 5812</span><span class="job">성폭력 상담소·보호시설·피해 지원</span></div>
+      <div class="ev">근거: 성범죄 발생 규모 — 강간·강제추행 <b id="m_sex3"></b></div>
+      <div class="arrow">→ 상담·의료비 <b>수요예측·예산</b></div>
+    </div>
+  </div>
 
   <!-- ===== 5대범죄 ===== -->
   <div class="sec-title"><h3>5대범죄 · 발생과 검거</h3><span class="ln"></span></div>
@@ -104,35 +154,26 @@
   </div>
 
   <section class="card">
-    <h2>🎯 죄종별 검거율</h2>
-    <p class="desc">검거 ÷ 발생. 절도가 가장 낮아 거리·생활범죄 대응의 약한 고리입니다. (살인은 전년 이월 검거로 100% 초과)</p>
+    <h2>🎯 죄종별 검거율 — 검거(경찰) vs 예방(구청)</h2>
+    <p class="desc"><b>강간·강제추행 검거율은 이미 83%</b> — 검거는 경찰의 몫입니다. 가족정책과가 더할 수 있는 것은 <b>환경적 예방(CPTED)</b>: 어두운 곳 밝히기·동행순찰·비상벨. 절도 검거율 54%는 1인가구 방범 강화의 명분입니다. (살인은 전년 이월 검거로 100% 초과)</p>
     <div class="chartbox" style="height:240px"><canvas id="rateChart"></canvas></div>
   </section>
 
-  <!-- ===== 주정차 단속 ===== -->
-  <div class="sec-title"><h3>거리 질서 · 주정차 위반 단속</h3><span class="ln"></span></div>
-
-  <div class="grid2">
-    <section class="card">
-      <h2>📍 행정동별 단속 Top</h2>
-      <p class="desc" id="dongDesc"></p>
-      <div class="chartbox" style="height:360px"><canvas id="dongChart"></canvas></div>
-    </section>
-    <section class="card">
-      <h2>📈 월별 단속 추이</h2>
-      <p class="desc">2024년 단속 건수의 월별 변화</p>
-      <div class="chartbox" style="height:230px"><canvas id="monthChart"></canvas></div>
-      <h2 style="margin-top:18px">🛠️ 단속 수단 구성</h2>
-      <p class="desc">어떤 방법으로 적발했는가</p>
-      <div class="chartbox" style="height:120px"><canvas id="gubunChart"></canvas></div>
-    </section>
-  </div>
-
-  <!-- ===== 가로등 ===== -->
-  <div class="sec-title"><h3>야간 안전 인프라 · 가로등 분포</h3><span class="ln"></span></div>
+  <!-- ===== 야간 여성안전 (CPTED) ===== -->
+  <div class="sec-title"><h3>야간 여성안전 — 조명 사각 × CPTED 후보지 (☎5838)</h3><span class="ln"></span></div>
 
   <section class="card">
-    <h2>💡 강남구 가로등 밀도 지도</h2>
+    <h2>🧭 야간 여성안전 취약 삼각측량</h2>
+    <p class="desc">성범죄 좌표가 비공개이므로, 공개 가능한 <b>대리지표 3개를 겹쳐</b> 취약 지점을 추정합니다. 이 삼각측량이 안심길·비상벨·동행순찰의 입지 논리입니다.</p>
+    <div class="tri">
+      <div class="t"><div class="h">① 성범죄 규모</div><div class="b">강간·강제추행 <b id="m_sexA"></b> — 야간·보행 취약의 핵심 신호</div></div>
+      <div class="t"><div class="h">② 조명 사각</div><div class="b">가로등 <b id="m_lampA"></b>의 빈 영역 = 야간 우범 환경 후보</div></div>
+      <div class="t"><div class="h">③ 절도 압력</div><div class="b">절도 검거율 <b id="m_theftrateA"></b> — 생활범죄 노출도 보조지표</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>💡 여성안심길·안심계단 후보 지도 (가로등·바닥신호등)</h2>
     <p class="desc" id="lampDesc"></p>
     <div class="mapwrap">
       <div id="lampMap"></div>
@@ -161,8 +202,37 @@
   </div>
 
   <section class="note">
-    <b>데이터 범위 안내</b> — 강남구의 <b>범죄 발생 ‘장소·도로 단위’ 세부 데이터는 공개되지 않습니다</b>(개인정보 보호). 따라서 골목·도로별 위험도는 매핑할 수 없으며, 메인 지표는 강남구 단위로 공개된 통계(5대범죄 죄종별, 주정차 동별, 가로등·바닥신호등 좌표)만 사용했습니다. 위 ‘참고’ 섹션의 장소별 패턴은 강남 분리가 불가능한 <b>서울/전국 집계</b>로, 비교 맥락용입니다. 도로 단위 분석은 ‘생활안전지도 범죄주의구간(15101797)’ 연동 시 확장 가능합니다.
+    <b>이 보드의 성격 — ‘운영 콘솔’이 아니라 ‘설득 근거 보드’</b><br/>
+    강남구의 <b>범죄는 ‘구 전체·죄종별’까지만 공개</b>되고 동·골목 단위는 없습니다(개인정보 보호). 따라서 <b>“어느 동·골목에 먼저”의 마지막 한 칸은 못 채웁니다.</b> 이 화면은 매일 켜는 운영 콘솔이 아니라, <b>연·분기 사업계획·예산·의회·기관협업을 설득하는 근거 보드</b>입니다(설득가치 ↑, 현장 운영가치는 제한적). ‘참고’ 섹션의 장소별 패턴은 강남 분리가 불가능한 서울/전국 집계입니다.
   </section>
+
+  <!-- ===== 100점 로드맵 ===== -->
+  <div class="sec-title"><h3>현장 입지 도구(100점)로 가는 다음 데이터</h3><span class="ln"></span></div>
+  <section class="card">
+    <h2>🧩 보완 로드맵 (우선순위)</h2>
+    <p class="desc">아래를 얹으면 ‘설득 도구’를 넘어 <b>동·골목 단위 현장 입지 도구</b>가 됩니다.</p>
+    <ul class="road">
+      <li><span class="n">1</span><span><b>동별 성범죄 / 범죄주의구간(15101797 WMS, 도로 10등급)</b> — 구→동·골목 해상도 ↑ → 안심길·스카우트 <b>동 선정</b> 가능</span></li>
+      <li><span class="n">2</span><span><b>여성안심 인프라 좌표</b>(안심길·비상벨·택배함·지킴이집·스카우트 6개 동) — 가족정책과 직접 소관 → 공백·성과 점검</span></li>
+      <li><span class="n">3</span><span><b>성범죄 시간대·요일</b> — 스카우트 운영시간·교육 시점 결정</span></li>
+    </ul>
+  </section>
+
+  <!-- ===== 참고: 타 부서 소관 ===== -->
+  <div class="sec-title"><h3>참고 · 거리질서(주차관리과 소관 — 여성안전 직접 무관)</h3><span class="ln"></span></div>
+  <div class="grid2 muted-sec">
+    <section class="card">
+      <h2>📍 주정차 위반 단속 — 행정동별 Top <span class="badge">참고</span></h2>
+      <p class="desc" id="dongDesc"></p>
+      <div class="chartbox" style="height:360px"><canvas id="dongChart"></canvas></div>
+    </section>
+    <section class="card">
+      <h2>📈 월별 추이 · 단속 수단 <span class="badge">참고</span></h2>
+      <p class="desc">2024년 단속 건수의 월별 변화 (생활질서 보조지표)</p>
+      <div class="chartbox" style="height:230px"><canvas id="monthChart"></canvas></div>
+      <div class="chartbox" style="height:120px;margin-top:14px"><canvas id="gubunChart"></canvas></div>
+    </section>
+  </div>
 
   <footer id="foot"></footer>
 </div>
@@ -202,17 +272,24 @@ const valueLabel={id:"valueLabel",afterDatasetsDraw(chart){
   ctx.font='700 11px '+Chart.defaults.font.family;ctx.textBaseline="middle";ctx.fillStyle="#94a3b8";ctx.textAlign="left";
   m.data.forEach((b,i)=>{const v=ds.data[i];if(v)ctx.fillText(fmt(v),b.x+6,b.y);});ctx.restore();}};
 
-// ---- hero / insight / KPI ----
-document.getElementById("heroCrime").textContent=fmt(TOTB)+"건";
-document.getElementById("heroRate").textContent="검거율 "+RATE.toFixed(1)+"%";
+// ---- hero / insight / KPI (여성안전 관점) ----
+const SEX=byCrime["강간·강제추행"], THEFT=byCrime["절도"], LAMP=D.lamps.length, CROSS=(D.cross||[]).length;
+const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+document.getElementById("heroCrime").textContent=fmt(SEX.발생)+"건";
+document.getElementById("heroRate").textContent=`검거율 ${SEX.검거율}% · 5대범죄 전체 ${fmt(TOTB)}건`;
 document.getElementById("insight").innerHTML=
-  `<span class="ic">💡</span><span>강남구 5대범죄의 절반 이상이 <b>${topCrime.죄}</b>(${fmt(topCrime.발생)}건·${(topCrime.발생/TOTB*100).toFixed(1)}%) · 가장 검거가 어려운 범죄는 <b>절도</b>(검거율 ${byCrime["절도"].검거율}%)입니다.</span>`;
-const lowest=[...G].sort((a,b)=>a.검거율-b.검거율)[0];
+  `<span class="ic">💡</span><span>성범죄(강간·강제추행) <b>${fmt(SEX.발생)}건</b>·검거율 <b>${SEX.검거율}%</b> — 검거는 경찰의 몫, 구청은 <b>예방환경(CPTED)</b>. 절도 검거율 <b>${THEFT.검거율}%</b>는 1인가구 방범 강화의 명분입니다.</span>`;
 document.getElementById("kpis").innerHTML=`
-  <div class="kpi"><span class="l">5대범죄 발생</span><span class="v">${fmt(TOTB)}</span><span class="sub">강남구 · 2024년</span></div>
-  <div class="kpi"><span class="l">전체 검거율</span><span class="v g">${RATE.toFixed(1)}%</span><span class="sub">검거 ${fmt(TOTC)}건</span></div>
-  <div class="kpi"><span class="l">최다 범죄</span><span class="v o">${topCrime.죄}</span><span class="sub">${fmt(topCrime.발생)}건 · ${(topCrime.발생/TOTB*100).toFixed(0)}%</span></div>
-  <div class="kpi"><span class="l">주정차 단속</span><span class="v b">${fmt(D.parking.total)}</span><span class="sub">2024 누적 · 거리질서</span></div>`;
+  <div class="kpi"><span class="l">성범죄(강간·강제추행)</span><span class="v r">${fmt(SEX.발생)}</span><span class="sub">5대범죄의 ${(SEX.발생/TOTB*100).toFixed(1)}% · ☎5839·5812</span></div>
+  <div class="kpi"><span class="l">성범죄 검거율</span><span class="v g">${SEX.검거율}%</span><span class="sub">검거=경찰 / 예방=구청</span></div>
+  <div class="kpi"><span class="l">절도 검거율</span><span class="v o">${THEFT.검거율}%</span><span class="sub">${fmt(THEFT.발생)}건 · 1인가구 방범 ☎5814</span></div>
+  <div class="kpi"><span class="l">야간 안전 인프라</span><span class="v b">${fmt(LAMP)}</span><span class="sub">가로등 + 바닥신호등 ${CROSS}개 ☎5838</span></div>`;
+// 담당자 카드 · 삼각측량 수치
+set("m_lamp",fmt(LAMP)+"개");set("m_sex",fmt(SEX.발생)+"건");
+set("m_sex2",fmt(SEX.발생)+"건");set("m_sexrate",SEX.검거율+"%");
+set("m_theft",fmt(THEFT.발생)+"건");set("m_theftrate",THEFT.검거율+"%");
+set("m_sex3",fmt(SEX.발생)+"건");
+set("m_sexA",fmt(SEX.발생)+"건");set("m_lampA",fmt(LAMP)+"개");set("m_theftrateA",THEFT.검거율+"%");
 document.getElementById("foot").innerHTML=
   `데이터 출처: 공공데이터포털/서울열린데이터 · ${D.src.crime}(5대범죄) · ${D.src.parking}(주정차) · ${D.src.lamp}(가로등) · ${D.src.cross}(바닥신호등) · 참고: ${D.src.seoul}(서울 장소별)·${D.src.nation}(전국 장소별) · 공간범위: 서울 강남구(참고 데이터는 서울/전국) · 기간: 2024년<br/>※ 5대범죄 강남구 수치는 강남구 치안통계표와 강남·수서경찰서 관할 합계가 일치함을 교차검증했습니다.`;
 
@@ -313,7 +390,7 @@ new Chart(document.getElementById("nationPlaceChart"),{
   const pts=D.lamps,cross=D.cross||[];
   document.getElementById("lampN").textContent=`${fmt(pts.length)}개`;
   document.getElementById("crossN").textContent=`${fmt(cross.length)}개`;
-  document.getElementById("lampDesc").textContent=`강남구 일대 가로등 ${fmt(pts.length)}개 + 바닥신호등 ${fmt(cross.length)}개의 실제 위치를 실거리 지도에 올렸습니다. 밝은 영역일수록 야간 조명이 촘촘하고, 어두운 영역은 상대적 조명 사각지대입니다. ※ 가로등 데이터(OA-22205)는 관리 대상 도로 위주의 부분 집합입니다.`;
+  document.getElementById("lampDesc").innerHTML=`강남구 일대 가로등 <b>${fmt(pts.length)}개</b> + 바닥신호등 <b>${fmt(cross.length)}개</b>를 실거리 지도에 올렸습니다. <b style="color:#fdba74">어두운(조명 사각) 영역이 여성안심길·안심계단 개선 1순위 후보</b>입니다(☎5838). 밝을수록 조명이 촘촘. ※ 가로등(OA-22205)은 관리 대상 도로 위주의 부분 집합이라, 동별 성범죄·범죄주의구간(15101797)과 겹치면 후보지가 더 또렷해집니다.`;
   if(typeof L==="undefined"){document.getElementById("lampDesc").textContent+=" (지도 라이브러리 로드 실패 — 인터넷 연결 필요)";return;}
   const map=L.map("lampMap",{zoomControl:true,attributionControl:true,scrollWheelZoom:false});
   L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
