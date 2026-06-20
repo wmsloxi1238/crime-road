@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>강남구 안전 대시보드 — 5대범죄·주정차·가로등</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="datasets.js"></script>
 <style>
   :root{
@@ -51,10 +54,11 @@
   .grid2{display:grid;grid-template-columns:1fr;gap:22px}
   @media(min-width:820px){.grid2{grid-template-columns:1fr 1fr}}
   .chartbox{position:relative;width:100%}
-  .mapwrap{position:relative;width:100%;height:420px;border-radius:14px;overflow:hidden;background:#0b1220;border:1px solid var(--line)}
-  #lampCanvas{width:100%;height:100%;display:block}
-  .maplegend{position:absolute;left:12px;bottom:12px;font-size:11px;color:#cbd5e1;background:rgba(15,23,42,.7);
-    border:1px solid var(--line);border-radius:10px;padding:8px 10px;line-height:1.6}
+  .mapwrap{position:relative;width:100%;height:440px;border-radius:14px;overflow:hidden;background:#0b1220;border:1px solid var(--line)}
+  #lampMap{width:100%;height:100%}
+  .leaflet-container{background:#0b1220;font-family:inherit}
+  .maplegend{position:absolute;left:12px;bottom:12px;z-index:1000;font-size:11px;color:#cbd5e1;background:rgba(15,23,42,.82);
+    border:1px solid var(--line);border-radius:10px;padding:8px 10px;line-height:1.6;pointer-events:none}
   .swatch{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
   footer{font-size:12px;color:#64748b;line-height:1.7;padding-bottom:8px}
   .note{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.25);border-radius:14px;padding:14px 16px;font-size:13px;color:#bfdbfe}
@@ -131,7 +135,7 @@
     <h2>💡 강남구 가로등 밀도 지도</h2>
     <p class="desc" id="lampDesc"></p>
     <div class="mapwrap">
-      <canvas id="lampCanvas"></canvas>
+      <div id="lampMap"></div>
       <div class="maplegend">
         <span class="swatch" style="background:#fde68a"></span>가로등 <span id="lampN" style="color:#94a3b8"></span><br/>
         <span class="swatch" style="background:#34d399"></span>바닥신호등 <span id="crossN" style="color:#94a3b8"></span><br/>
@@ -304,38 +308,24 @@ new Chart(document.getElementById("nationPlaceChart"),{
   plugins:[valueLabel]}
 });
 
-// ---- 가로등 밀도 캔버스 ----
+// ---- 가로등 밀도 지도 (Leaflet + heat) ----
 (function(){
-  const cv=document.getElementById("lampCanvas"),box=cv.parentElement;
-  const b=D.lampBbox,pts=D.lamps,cross=D.cross||[];
+  const pts=D.lamps,cross=D.cross||[];
   document.getElementById("lampN").textContent=`${fmt(pts.length)}개`;
   document.getElementById("crossN").textContent=`${fmt(cross.length)}개`;
-  document.getElementById("lampDesc").textContent=`강남구 영역 가로등 ${fmt(pts.length)}개 + 바닥신호등 ${fmt(cross.length)}개의 실제 위치(위·경도). 노란 점이 빽빽할수록 야간 조명이 촘촘하고, 빈 영역은 상대적 조명 사각지대입니다. 초록 점(바닥신호등)은 보행자 야간 안전 보강 지점입니다.`;
-  function draw(){
-    const r=box.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
-    cv.width=r.width*dpr;cv.height=r.height*dpr;
-    const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
-    ctx.clearRect(0,0,r.width,r.height);
-    const pad=14,W=r.width-pad*2,H=r.height-pad*2;
-    const x=lo=>pad+(lo-b.minLo)/(b.maxLo-b.minLo)*W;
-    const y=la=>pad+(b.maxLa-la)/(b.maxLa-b.minLa)*H;     // 위도 위쪽이 북
-    ctx.globalCompositeOperation="lighter";
-    for(const[la,lo]of pts){
-      const g=ctx.createRadialGradient(x(lo),y(la),0,x(lo),y(la),7);
-      g.addColorStop(0,"rgba(253,230,138,.55)");g.addColorStop(1,"rgba(253,230,138,0)");
-      ctx.fillStyle=g;ctx.beginPath();ctx.arc(x(lo),y(la),7,0,7);ctx.fill();
-    }
-    ctx.globalCompositeOperation="source-over";
-    ctx.fillStyle="rgba(255,237,160,.9)";
-    for(const[la,lo]of pts){ctx.fillRect(x(lo)-.6,y(la)-.6,1.2,1.2);}
-    // 바닥신호등 (강남구 15067095)
-    for(const[la,lo]of cross){
-      ctx.beginPath();ctx.arc(x(lo),y(la),3.2,0,7);
-      ctx.fillStyle="rgba(52,211,153,.95)";ctx.fill();
-      ctx.lineWidth=1;ctx.strokeStyle="rgba(6,78,59,.9)";ctx.stroke();
-    }
-  }
-  draw();let t;window.addEventListener("resize",()=>{clearTimeout(t);t=setTimeout(draw,150);});
+  document.getElementById("lampDesc").textContent=`강남구 일대 가로등 ${fmt(pts.length)}개 + 바닥신호등 ${fmt(cross.length)}개의 실제 위치를 실거리 지도에 올렸습니다. 밝은 영역일수록 야간 조명이 촘촘하고, 어두운 영역은 상대적 조명 사각지대입니다. ※ 가로등 데이터(OA-22205)는 관리 대상 도로 위주의 부분 집합입니다.`;
+  if(typeof L==="undefined"){document.getElementById("lampDesc").textContent+=" (지도 라이브러리 로드 실패 — 인터넷 연결 필요)";return;}
+  const map=L.map("lampMap",{zoomControl:true,attributionControl:true,scrollWheelZoom:false});
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    {maxZoom:19,subdomains:"abcd",attribution:'© OpenStreetMap · © CARTO'}).addTo(map);
+  L.heatLayer(pts.map(p=>[p[0],p[1],0.7]),
+    {radius:12,blur:15,minOpacity:.3,maxZoom:16,
+     gradient:{0.2:"#6d28d9",0.45:"#d97706",0.7:"#f59e0b",1:"#fde68a"}}).addTo(map);
+  cross.forEach(p=>L.circleMarker([p[0],p[1]],
+    {radius:4,color:"#064e3b",weight:1,fillColor:"#34d399",fillOpacity:.95}).addTo(map));
+  const bounds=L.latLngBounds(pts.map(p=>[p[0],p[1]]));
+  map.fitBounds(bounds,{padding:[20,20]});
+  setTimeout(()=>map.invalidateSize(),200);
 })();
 </script>
 </body>
