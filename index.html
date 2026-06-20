@@ -183,7 +183,7 @@ const byCrime=Object.fromEntries(G.map(x=>[x.죄,x]));
 const TOTB=G.reduce((s,x)=>s+x.발생,0);
 const TOTC=G.reduce((s,x)=>s+x.검거,0);
 const RATE=(TOTC/TOTB*100);
-const top=[...G].sort((a,b)=>b.발생-a.발생)[0];
+const topCrime=[...G].sort((a,b)=>b.발생-a.발생)[0];
 const ordered=[...G].sort((a,b)=>b.발생-a.발생);     // 발생 내림차순
 
 // ---- doughnut center plugin ----
@@ -202,12 +202,12 @@ const valueLabel={id:"valueLabel",afterDatasetsDraw(chart){
 document.getElementById("heroCrime").textContent=fmt(TOTB)+"건";
 document.getElementById("heroRate").textContent="검거율 "+RATE.toFixed(1)+"%";
 document.getElementById("insight").innerHTML=
-  `<span class="ic">💡</span><span>강남구 5대범죄의 절반 이상이 <b>${top.죄}</b>(${fmt(top.발생)}건·${(top.발생/TOTB*100).toFixed(1)}%) · 가장 검거가 어려운 범죄는 <b>절도</b>(검거율 ${byCrime["절도"].검거율}%)입니다.</span>`;
+  `<span class="ic">💡</span><span>강남구 5대범죄의 절반 이상이 <b>${topCrime.죄}</b>(${fmt(topCrime.발생)}건·${(topCrime.발생/TOTB*100).toFixed(1)}%) · 가장 검거가 어려운 범죄는 <b>절도</b>(검거율 ${byCrime["절도"].검거율}%)입니다.</span>`;
 const lowest=[...G].sort((a,b)=>a.검거율-b.검거율)[0];
 document.getElementById("kpis").innerHTML=`
   <div class="kpi"><span class="l">5대범죄 발생</span><span class="v">${fmt(TOTB)}</span><span class="sub">강남구 · 2024년</span></div>
   <div class="kpi"><span class="l">전체 검거율</span><span class="v g">${RATE.toFixed(1)}%</span><span class="sub">검거 ${fmt(TOTC)}건</span></div>
-  <div class="kpi"><span class="l">최다 범죄</span><span class="v o">${top.죄}</span><span class="sub">${fmt(top.발생)}건 · ${(top.발생/TOTB*100).toFixed(0)}%</span></div>
+  <div class="kpi"><span class="l">최다 범죄</span><span class="v o">${topCrime.죄}</span><span class="sub">${fmt(topCrime.발생)}건 · ${(topCrime.발생/TOTB*100).toFixed(0)}%</span></div>
   <div class="kpi"><span class="l">주정차 단속</span><span class="v b">${fmt(D.parking.total)}</span><span class="sub">2024 누적 · 거리질서</span></div>`;
 document.getElementById("foot").innerHTML=
   `데이터 출처: 공공데이터포털/서울열린데이터 · ${D.src.crime}(5대범죄) · ${D.src.parking}(주정차) · ${D.src.lamp}(가로등) · ${D.src.cross}(바닥신호등) · 참고: ${D.src.seoul}(서울 장소별)·${D.src.nation}(전국 장소별) · 공간범위: 서울 강남구(참고 데이터는 서울/전국) · 기간: 2024년<br/>※ 5대범죄 강남구 수치는 강남구 치안통계표와 강남·수서경찰서 관할 합계가 일치함을 교차검증했습니다.`;
