@@ -46,6 +46,8 @@
   .card:hover{border-color:#475569}
   .card h2{font-size:17px;color:#fff;margin-bottom:4px}
   .card .desc{font-size:13px;color:var(--muted);margin-bottom:16px}
+  .badge{display:inline-block;font-size:11px;font-weight:700;color:#93c5fd;background:rgba(59,130,246,.15);
+    border:1px solid rgba(59,130,246,.4);border-radius:999px;padding:2px 9px;vertical-align:middle;margin-left:4px}
   .grid2{display:grid;grid-template-columns:1fr;gap:22px}
   @media(min-width:820px){.grid2{grid-template-columns:1fr 1fr}}
   .chartbox{position:relative;width:100%}
@@ -131,14 +133,31 @@
     <div class="mapwrap">
       <canvas id="lampCanvas"></canvas>
       <div class="maplegend">
-        <span class="swatch" style="background:#fde68a"></span>가로등(점)<br/>
+        <span class="swatch" style="background:#fde68a"></span>가로등 <span id="lampN" style="color:#94a3b8"></span><br/>
+        <span class="swatch" style="background:#34d399"></span>바닥신호등 <span id="crossN" style="color:#94a3b8"></span><br/>
         <span style="color:#94a3b8">밝을수록 가로등 밀집 · 어두운 영역 = 조명 사각</span>
       </div>
     </div>
   </section>
 
+  <!-- ===== 참고: 서울/전국 장소 패턴 ===== -->
+  <div class="sec-title"><h3>참고 · 서울/전국 장소별 범죄 패턴 (강남 단위 미공개)</h3><span class="ln"></span></div>
+
+  <div class="grid2">
+    <section class="card">
+      <h2>🏙️ 서울 5대범죄 — 장소별 Top 12 <span class="badge">서울 전체</span></h2>
+      <p class="desc">강남구 장소 데이터가 없어 <b>서울 전체</b> 기준 참고용. 보도·골목길이 단일 장소 1위입니다. (15054737)</p>
+      <div class="chartbox" style="height:360px"><canvas id="seoulPlaceChart"></canvas></div>
+    </section>
+    <section class="card">
+      <h2>🇰🇷 전국 범죄 — 장소별 Top 12 <span class="badge">전국</span></h2>
+      <p class="desc">전 범죄 유형 기준 <b>전국</b> 발생 장소. 일반도로·아파트·골목길 순. 강남과 직접 연결되진 않는 거시 패턴입니다. (3074463)</p>
+      <div class="chartbox" style="height:360px"><canvas id="nationPlaceChart"></canvas></div>
+    </section>
+  </div>
+
   <section class="note">
-    <b>데이터 범위 안내</b> — 강남구의 <b>범죄 발생 ‘장소·도로 단위’ 세부 데이터는 공개되지 않습니다</b>(개인정보 보호). 따라서 골목·도로별 위험도는 매핑할 수 없으며, 본 대시보드는 강남구 단위로 공개된 통계(5대범죄 죄종별, 주정차 동별, 가로등 좌표)만 시각화했습니다. 도로 단위 분석은 ‘생활안전지도 범죄주의구간(15101797)’ 연동 시 확장 가능합니다.
+    <b>데이터 범위 안내</b> — 강남구의 <b>범죄 발생 ‘장소·도로 단위’ 세부 데이터는 공개되지 않습니다</b>(개인정보 보호). 따라서 골목·도로별 위험도는 매핑할 수 없으며, 메인 지표는 강남구 단위로 공개된 통계(5대범죄 죄종별, 주정차 동별, 가로등·바닥신호등 좌표)만 사용했습니다. 위 ‘참고’ 섹션의 장소별 패턴은 강남 분리가 불가능한 <b>서울/전국 집계</b>로, 비교 맥락용입니다. 도로 단위 분석은 ‘생활안전지도 범죄주의구간(15101797)’ 연동 시 확장 가능합니다.
   </section>
 
   <footer id="foot"></footer>
@@ -191,7 +210,7 @@ document.getElementById("kpis").innerHTML=`
   <div class="kpi"><span class="l">최다 범죄</span><span class="v o">${top.죄}</span><span class="sub">${fmt(top.발생)}건 · ${(top.발생/TOTB*100).toFixed(0)}%</span></div>
   <div class="kpi"><span class="l">주정차 단속</span><span class="v b">${fmt(D.parking.total)}</span><span class="sub">2024 누적 · 거리질서</span></div>`;
 document.getElementById("foot").innerHTML=
-  `데이터 출처: 공공데이터포털 · ${D.src.crime}(5대범죄) · ${D.src.parking}(주정차 단속) · ${D.src.lamp}(가로등) · 공간범위: 서울 강남구 · 기간: 2024년<br/>※ 5대범죄 강남구 수치는 강남구 치안통계표와 강남·수서경찰서 관할 합계가 일치함을 교차검증했습니다.`;
+  `데이터 출처: 공공데이터포털/서울열린데이터 · ${D.src.crime}(5대범죄) · ${D.src.parking}(주정차) · ${D.src.lamp}(가로등) · ${D.src.cross}(바닥신호등) · 참고: ${D.src.seoul}(서울 장소별)·${D.src.nation}(전국 장소별) · 공간범위: 서울 강남구(참고 데이터는 서울/전국) · 기간: 2024년<br/>※ 5대범죄 강남구 수치는 강남구 치안통계표와 강남·수서경찰서 관할 합계가 일치함을 교차검증했습니다.`;
 
 // ---- 죄종별 발생 vs 검거 ----
 new Chart(document.getElementById("crimeChart"),{
@@ -261,11 +280,37 @@ new Chart(document.getElementById("gubunChart"),{
       tooltip:{callbacks:{label:c=>` ${c.label}: ${fmt(c.parsed)}건`}}}}
 });
 
+// ---- [참고] 서울 장소별 (15054737) stacked Top12 ----
+const SHORT=p=>p.replace("(보도/골목길)","").replace("(원룸)","").replace("(기숙사 등)","").replace(", 소매점","").replace(/\(.*?\)/g,"");
+new Chart(document.getElementById("seoulPlaceChart"),{
+  type:"bar",
+  data:{labels:D.seoulPlace.map((x,i)=>`${i+1}. ${SHORT(x.장소)}`),
+    datasets:CRIMES.map(c=>({label:c,data:D.seoulPlace.map(x=>x[c]||0),backgroundColor:COLOR[c]}))},
+  options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
+    scales:{x:{stacked:true,...baseScale.x},y:{stacked:true,grid:{display:false},ticks:{color:"#cbd5e1"}}},
+    plugins:{legend:{labels:{boxWidth:12}},
+      tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmt(c.parsed.x)}건`}}}}
+});
+
+// ---- [참고] 전국 장소별 (3074463) Top12 ----
+const natColor=D.nationPlace.map(d=>d[0].includes("골목")?"#f97316":d[0].includes("도로")?"#60a5fa":"#475569");
+new Chart(document.getElementById("nationPlaceChart"),{
+  type:"bar",
+  data:{labels:D.nationPlace.map((d,i)=>`${i+1}. ${SHORT(d[0])}`),
+    datasets:[{data:D.nationPlace.map(d=>d[1]),backgroundColor:natColor,borderRadius:4,maxBarThickness:24}]},
+  options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,layout:{padding:{right:52}},
+    scales:{x:{...baseScale.x,grace:"8%"},y:{grid:{display:false},ticks:{color:"#cbd5e1"}}},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${fmt(c.parsed.x)}건`}}},
+  plugins:[valueLabel]}
+});
+
 // ---- 가로등 밀도 캔버스 ----
 (function(){
   const cv=document.getElementById("lampCanvas"),box=cv.parentElement;
-  const b=D.lampBbox,pts=D.lamps;
-  document.getElementById("lampDesc").textContent=`강남구 영역 가로등 ${fmt(pts.length)}개 위치(위·경도). 점이 빽빽할수록 야간 조명이 촘촘하고, 빈 영역은 상대적 조명 사각지대입니다.`;
+  const b=D.lampBbox,pts=D.lamps,cross=D.cross||[];
+  document.getElementById("lampN").textContent=`${fmt(pts.length)}개`;
+  document.getElementById("crossN").textContent=`${fmt(cross.length)}개`;
+  document.getElementById("lampDesc").textContent=`강남구 영역 가로등 ${fmt(pts.length)}개 + 바닥신호등 ${fmt(cross.length)}개의 실제 위치(위·경도). 노란 점이 빽빽할수록 야간 조명이 촘촘하고, 빈 영역은 상대적 조명 사각지대입니다. 초록 점(바닥신호등)은 보행자 야간 안전 보강 지점입니다.`;
   function draw(){
     const r=box.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
     cv.width=r.width*dpr;cv.height=r.height*dpr;
@@ -283,6 +328,12 @@ new Chart(document.getElementById("gubunChart"),{
     ctx.globalCompositeOperation="source-over";
     ctx.fillStyle="rgba(255,237,160,.9)";
     for(const[la,lo]of pts){ctx.fillRect(x(lo)-.6,y(la)-.6,1.2,1.2);}
+    // 바닥신호등 (강남구 15067095)
+    for(const[la,lo]of cross){
+      ctx.beginPath();ctx.arc(x(lo),y(la),3.2,0,7);
+      ctx.fillStyle="rgba(52,211,153,.95)";ctx.fill();
+      ctx.lineWidth=1;ctx.strokeStyle="rgba(6,78,59,.9)";ctx.stroke();
+    }
   }
   draw();let t;window.addEventListener("resize",()=>{clearTimeout(t);t=setTimeout(draw,150);});
 })();
