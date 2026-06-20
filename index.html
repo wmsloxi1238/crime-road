@@ -8,27 +8,49 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 <script src="datasets.js"></script>
 <style>
   :root{
-    --bg:#0f172a; --panel:#1e293b; --panel2:#1e293bcc; --line:#334155;
-    --text:#e2e8f0; --muted:#94a3b8; --orange:#f97316; --blue:#3b82f6;
+    --bg:#0b1120; --panel:#1e293b; --panel2:#1e293bcc; --line:#2a3a55; --line2:#3a4d6e;
+    --text:#e6edf6; --muted:#93a4bd; --orange:#fb8b3c; --blue:#3b82f6;
     --purple:#a855f7; --yellow:#eab308; --red:#ef4444; --green:#22c55e;
+    --shadow:0 12px 36px -16px rgba(0,0,0,.55); --glass:rgba(26,36,56,.55);
+    font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.5}
-  .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-direction:column;gap:22px}
-  .hero{border:1px solid var(--line);border-radius:24px;padding:32px 28px;
-    background:radial-gradient(120% 140% at 0% 0%, rgba(249,115,22,.22), rgba(30,41,59,.4) 45%, #0f172a 100%)}
+  html{scroll-behavior:smooth}
+  body{color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    font-family:inherit;
+    background:
+      radial-gradient(900px 500px at 88% -8%, rgba(249,115,22,.10), transparent 60%),
+      radial-gradient(820px 520px at -6% 6%, rgba(59,130,246,.10), transparent 55%),
+      #0b1120;
+    background-attachment:fixed}
+  ::selection{background:rgba(251,139,60,.32)}
+  ::-webkit-scrollbar{width:11px;height:11px}
+  ::-webkit-scrollbar-thumb{background:#2a3a55;border-radius:8px;border:3px solid #0b1120}
+  ::-webkit-scrollbar-thumb:hover{background:#3a4d6e}
+  .wrap{max-width:1120px;margin:0 auto;padding:26px 16px 64px;display:flex;flex-direction:column;gap:24px}
+  .hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:26px;padding:38px 32px;box-shadow:var(--shadow);
+    background:
+      radial-gradient(130% 150% at 0% 0%, rgba(249,115,22,.26), rgba(30,41,59,.35) 42%, rgba(11,17,32,.9) 100%),
+      linear-gradient(180deg, rgba(30,41,59,.5), rgba(11,17,32,.5))}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(148,163,184,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.05) 1px,transparent 1px);
+    background-size:34px 34px;mask:radial-gradient(120% 120% at 100% 0%,#000,transparent 70%)}
+  .hero>*{position:relative}
   .tag{display:inline-flex;align-items:center;gap:8px;color:var(--orange);font-size:12px;font-weight:700;letter-spacing:.04em}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);animation:p 1.6s infinite}
   @keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
-  h1{font-size:34px;font-weight:800;color:#fff;margin:14px 0 8px;line-height:1.2}
-  .lead{color:#cbd5e1;max-width:640px;font-size:15px}
+  h1{font-size:37px;font-weight:800;color:#fff;margin:16px 0 10px;line-height:1.18;letter-spacing:-.02em}
+  .lead{color:#c3d0e2;max-width:660px;font-size:15.5px}
   .lead b{color:#fff}
-  .hl{margin-top:20px;display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:12px;background:rgba(15,23,42,.6);
-    border:1px solid rgba(249,115,22,.35);border-radius:16px;padding:12px 20px}
-  .hl .big{font-size:30px;font-weight:800;color:var(--orange)}
+  .hl{margin-top:22px;display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:12px;
+    background:linear-gradient(135deg, rgba(249,115,22,.14), rgba(15,23,42,.5));
+    border:1px solid rgba(249,115,22,.4);border-radius:16px;padding:14px 22px;box-shadow:0 6px 20px -10px rgba(249,115,22,.5)}
+  .hl .big{font-size:32px;font-weight:800;
+    background:linear-gradient(90deg,#fdba74,#fb8b3c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
   .hl .s{font-size:13px;color:var(--muted)}
   .insight{display:flex;align-items:center;gap:10px;background:rgba(249,115,22,.08);
     border:1px solid rgba(249,115,22,.3);border-radius:14px;padding:12px 16px;font-size:14px;color:#fed7aa}
@@ -36,19 +58,25 @@
   .insight .ic{font-size:16px}
   .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
   @media(min-width:820px){.kpis{grid-template-columns:repeat(4,1fr)}}
-  .kpi{background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:4px;transition:transform .15s,border-color .2s}
-  .kpi:hover{transform:translateY(-2px);border-color:#475569}
-  .kpi .l{font-size:12px;color:var(--muted);font-weight:500}
-  .kpi .v{font-size:28px;font-weight:800;color:#fff}
-  .kpi .v.o{color:var(--orange)} .kpi .v.r{color:#fb7185} .kpi .v.g{color:var(--green)} .kpi .v.b{color:#60a5fa}
+  .kpi{position:relative;overflow:hidden;background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:4px;
+    box-shadow:var(--shadow);transition:transform .18s ease,border-color .2s,box-shadow .2s}
+  .kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--orange),transparent 70%);opacity:.7}
+  .kpi:hover{transform:translateY(-3px);border-color:var(--line2);box-shadow:0 16px 40px -18px rgba(0,0,0,.7)}
+  .kpi .l{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:-.01em}
+  .kpi .v{font-size:29px;font-weight:800;color:#fff;letter-spacing:-.02em}
+  .kpi .v.o{color:var(--orange)} .kpi .v.r{color:#fb7185} .kpi .v.g{color:#4ade80} .kpi .v.b{color:#60a5fa}
   .kpi .sub{font-size:12px;color:var(--muted)}
-  .sec-title{display:flex;align-items:baseline;gap:10px;margin:8px 2px 0}
-  .sec-title h3{font-size:13px;font-weight:700;color:var(--orange);letter-spacing:.05em}
-  .sec-title .ln{flex:1;height:1px;background:var(--line)}
-  .card{background:rgba(30,41,59,.4);border:1px solid var(--line);border-radius:18px;padding:20px;transition:border-color .2s}
-  .card:hover{border-color:#475569}
-  .card h2{font-size:17px;color:#fff;margin-bottom:4px}
-  .card .desc{font-size:13px;color:var(--muted);margin-bottom:16px}
+  .sec-title{display:flex;align-items:center;gap:11px;margin:12px 2px 0}
+  .sec-title h3{font-size:12.5px;font-weight:800;color:var(--orange);letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+  .sec-title h3::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--orange);box-shadow:0 0 10px var(--orange)}
+  .sec-title .ln{flex:1;height:1px;background:linear-gradient(90deg,var(--line2),transparent)}
+  .card{position:relative;background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow);
+    transition:border-color .2s,transform .18s ease,box-shadow .2s}
+  .card:hover{border-color:var(--line2);transform:translateY(-2px);box-shadow:0 18px 44px -20px rgba(0,0,0,.7)}
+  .card h2{font-size:17px;color:#fff;margin-bottom:5px;letter-spacing:-.01em}
+  .card .desc{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.65}
   .badge{display:inline-block;font-size:11px;font-weight:700;color:#93c5fd;background:rgba(59,130,246,.15);
     border:1px solid rgba(59,130,246,.4);border-radius:999px;padding:2px 9px;vertical-align:middle;margin-left:4px}
   .grid2{display:grid;grid-template-columns:1fr;gap:22px}
@@ -144,6 +172,10 @@
     .closing .q{font-size:18px}
     .hl .big{font-size:24px}.kpi .v{font-size:24px}.mapwrap{height:320px}
   }
+  /* 스크롤 등장 */
+  .reveal{opacity:0;transform:translateY(16px)}
+  .reveal.in{opacity:1;transform:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.7,.3,1)}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1!important;transform:none!important}}
 </style>
 </head>
 <body>
@@ -270,6 +302,8 @@
         <span class="swatch" style="background:#34d399"></span>바닥신호등 <span id="crossN" style="color:#94a3b8"></span><br/>
         <span class="swatch" style="background:#22d3ee"></span>여성안심지킴이집 <span id="guardN" style="color:#94a3b8"></span><br/>
         <span class="swatch" style="background:#f472b6"></span>안심택배함 <span id="delivN" style="color:#94a3b8"></span><br/>
+        <span class="swatch" style="background:#ef4444"></span>안심벨 <span id="bellN" style="color:#94a3b8"></span><br/>
+        <span class="swatch" style="background:#fb923c;border-radius:2px"></span>안심귀갓길 <span id="routeN" style="color:#94a3b8"></span><br/>
         <span style="color:#94a3b8">어두운 영역 = 조명 사각 · 인프라 마커 없는 곳 = 안심 공백</span>
       </div>
     </div>
@@ -407,7 +441,7 @@ set("m_theft",fmt(THEFT.발생)+"건");set("m_theftrate",THEFT.검거율+"%");
 set("m_sex3",fmt(SEX.발생)+"건");
 set("m_sexA",fmt(SEX.발생)+"건");set("m_lampA",fmt(LAMP)+"개");set("m_theftrateA",THEFT.검거율+"%");
 document.getElementById("foot").innerHTML=
-  `데이터 출처: 공공데이터포털/서울열린데이터 · ${D.src.crime}(5대범죄) · ${D.src.parking}(주정차) · ${D.src.lamp}(가로등) · ${D.src.cross}(바닥신호등) · ${D.src.guardian}(지킴이집) · ${D.src.delivery}(택배함) · 참고: ${D.src.seoul}(서울 장소별)·${D.src.nation}(전국 장소별) · 공간범위: 서울 강남구(참고 데이터는 서울/전국) · 기간: 2024년<br/>※ 5대범죄 강남구 수치는 강남구 치안통계표와 강남·수서경찰서 관할 합계가 일치함을 교차검증했습니다.`;
+  `데이터 출처: 공공데이터포털/서울열린데이터 · ${D.src.crime}(5대범죄) · ${D.src.parking}(주정차) · ${D.src.lamp}(가로등) · ${D.src.cross}(바닥신호등) · ${D.src.guardian}(지킴이집) · ${D.src.delivery}(택배함) · ${D.src.saferoute}(안심귀갓길) · ${D.src.safebell}(안심벨) · 참고: ${D.src.seoul}(서울 장소별)·${D.src.nation}(전국 장소별) · 공간범위: 서울 강남구(참고 데이터는 서울/전국) · 기간: 2024년<br/>※ 5대범죄 강남구 수치는 강남구 치안통계표와 강남·수서경찰서 관할 합계가 일치함을 교차검증했습니다.`;
 
 // ---- 죄종별 발생 vs 검거 ----
 new Chart(document.getElementById("crimeChart"),{
@@ -503,12 +537,14 @@ new Chart(document.getElementById("nationPlaceChart"),{
 
 // ---- 가로등 밀도 지도 (Leaflet + heat) ----
 (function(){
-  const pts=D.lamps,cross=D.cross||[],guard=D.guardian||[],deliv=D.delivery||[];
+  const pts=D.lamps,cross=D.cross||[],guard=D.guardian||[],deliv=D.delivery||[],bells=D.safebell||[],routes=D.saferoute||[];
   document.getElementById("lampN").textContent=`${fmt(pts.length)}개`;
   document.getElementById("crossN").textContent=`${fmt(cross.length)}개`;
   document.getElementById("guardN").textContent=`${fmt(guard.length)}개`;
   document.getElementById("delivN").textContent=`${fmt(deliv.length)}개`;
-  document.getElementById("lampDesc").innerHTML=`강남구 일대 가로등 <b>${fmt(pts.length)}개</b> · 바닥신호등 <b>${fmt(cross.length)}개</b> 위에, <b style="color:#22d3ee">여성안심지킴이집 ${fmt(guard.length)}개</b>·<b style="color:#f472b6">안심택배함 ${fmt(deliv.length)}개</b>(가족정책과 직접 소관)를 겹쳤습니다. <b style="color:#fdba74">어두운(조명 사각)이면서 안심 인프라 마커도 없는 영역이 여성안심길·지킴이집·택배함 확충 1순위 후보</b>입니다(☎5838·5814). ※ 가로등(OA-22205)은 관리도로 위주 부분집합이라, 동별 성범죄·범죄주의구간(15101797)을 얹으면 후보지가 더 또렷해집니다.`;
+  document.getElementById("bellN").textContent=`${fmt(bells.length)}개`;
+  document.getElementById("routeN").textContent=`${fmt(routes.length)}개 노선`;
+  document.getElementById("lampDesc").innerHTML=`강남구 일대 가로등 <b>${fmt(pts.length)}개</b>·바닥신호등 <b>${fmt(cross.length)}개</b> 위에, <b style="color:#fb923c">안심귀갓길 ${fmt(routes.length)}개 노선</b>·<b style="color:#ef4444">안심벨 ${fmt(bells.length)}개</b>·<b style="color:#22d3ee">지킴이집 ${fmt(guard.length)}개</b>·<b style="color:#f472b6">택배함 ${fmt(deliv.length)}개</b>(가족정책과 직접 소관)를 겹쳤습니다. <b style="color:#fdba74">조명이 어두우면서 안심귀갓길·안심벨이 닿지 않는 영역이 여성안심길·안심벨 확충 1순위 후보</b>입니다(☎5838·5814). ※ 동별 성범죄·범죄주의구간(15101797)을 얹으면 후보지가 더 또렷해집니다.`;
   if(typeof L==="undefined"){document.getElementById("lampDesc").textContent+=" (지도 라이브러리 로드 실패 — 인터넷 연결 필요)";return;}
   const map=L.map("lampMap",{zoomControl:true,attributionControl:true,scrollWheelZoom:false});
   L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
@@ -524,9 +560,25 @@ new Chart(document.getElementById("nationPlaceChart"),{
   deliv.forEach(p=>L.circleMarker([p[0],p[1]],
     {radius:7,color:"#9d174d",weight:1.5,fillColor:"#f472b6",fillOpacity:.95}).addTo(map)
     .bindTooltip(`📦 안심택배함<br>${p[2]||""}`,{direction:"top"}));
+  routes.forEach(line=>L.polyline(line,{color:"#fb923c",weight:3,opacity:.75}).addTo(map)
+    .bindTooltip("🛡️ 안심귀갓길",{sticky:true}));
+  bells.forEach(p=>L.circleMarker([p[0],p[1]],
+    {radius:5,color:"#7f1d1d",weight:1.5,fillColor:"#ef4444",fillOpacity:.95}).addTo(map)
+    .bindTooltip("🔔 안심벨",{direction:"top"}));
   const bounds=L.latLngBounds(pts.map(p=>[p[0],p[1]]));
   map.fitBounds(bounds,{padding:[20,20]});
   setTimeout(()=>map.invalidateSize(),200);
+})();
+
+// ---- 스크롤 등장 효과 ----
+(function(){
+  const els=document.querySelectorAll(".card, .kpi, .dec, .stage, .psrow, .closing, .note, .trust");
+  els.forEach((el,i)=>el.classList.add("reveal"));
+  if(!("IntersectionObserver"in window)){els.forEach(el=>el.classList.add("in"));return;}
+  const io=new IntersectionObserver((ents,o)=>{
+    ents.forEach(e=>{if(e.isIntersecting){e.target.style.transitionDelay=Math.min(e.target.dataset.d||0,120)+"ms";e.target.classList.add("in");o.unobserve(e.target);}});
+  },{threshold:.12,rootMargin:"0px 0px -8% 0px"});
+  els.forEach(el=>io.observe(el));
 })();
 </script>
 </body>
