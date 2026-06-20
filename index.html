@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>강남구 여성안심 현황 보드 — 가족정책팀 여성안전</title>
+<title>강남구 생활안전 현황 보드 — 가족정책팀</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -199,6 +199,14 @@
   .maptoggle .sw{width:9px;height:9px;border-radius:50%;display:inline-block}
   .leaflet-control-layers{background:rgba(11,17,32,.9)!important;color:#e6edf6!important;border:1px solid var(--line)!important;border-radius:10px!important}
   .leaflet-control-layers-list{color:#e6edf6}
+  .scroll{overflow-x:auto}
+  .factab{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px;min-width:460px}
+  .factab th{padding:8px 6px;color:var(--muted);font-weight:600;white-space:nowrap}
+  .factab th.l,.factab td.l{text-align:left;color:#e6edf6;font-weight:600}
+  .factab td{padding:3px;text-align:center}
+  .factab tr+tr{border-top:1px solid rgba(42,58,85,.5)}
+  .fcell{border-radius:6px;padding:6px 4px;font-weight:700}
+  .fcell.min{outline:1.5px solid #fb7185;outline-offset:-1.5px}
   [id]{scroll-margin-top:74px}
   /* 스크롤 등장 */
   .reveal{opacity:0;transform:translateY(16px)}
@@ -211,8 +219,8 @@
 <div class="wrap">
 
   <header class="hero">
-    <div class="tag"><span class="dot"></span> 가족정책팀 여성안전 · 2024 강남구</div>
-    <h1>여성안심 현황 보드</h1>
+    <div class="tag"><span class="dot"></span> 가족정책팀 · 2024 강남구 치안·생활안전</div>
+    <h1>생활안전 현황 보드</h1>
     <p class="lead">안심길·안심망·1인가구 안심·성폭력 예방 사업의 <b>입지·예산을 판단</b>하기 위한 업무 화면입니다. 강남구 단위로 공개된 경찰·구청 데이터를 교차검증해 한 화면에 모았습니다.</p>
     <div class="hl">
       <span class="s">성범죄(강간·강제추행)</span>
@@ -236,12 +244,12 @@
   <div class="sec-title"><h3>담당별 핵심 지표 — 내 업무 바로보기</h3><span class="ln"></span></div>
   <div class="deces">
     <div class="dec">
-      <div class="top"><span class="tel">☎ 5838</span><span class="job">여성안심길·안심계단·환경개선</span></div>
+      <div class="top"><span class="tel">☎ 5838</span><span class="job">안심길·안심계단·환경개선</span></div>
       <div class="ev">근거: 가로등 사각 × 성범죄 규모 — 가로등 <b id="m_lamp"></b> · 성범죄 <b id="m_sex"></b></div>
       <div class="arrow">→ 조명·계단 개선 <b>후보지·예산</b> 산출 (CPTED)</div>
     </div>
     <div class="dec">
-      <div class="top"><span class="tel">☎ 5839</span><span class="job">여성친화도시·24시간 안심망·예방교육</span></div>
+      <div class="top"><span class="tel">☎ 5839</span><span class="job">안심도시·24시간 안심망·예방교육</span></div>
       <div class="ev">근거: 강간·강제추행 규모·검거율 — <b id="m_sex2"></b> · 검거율 <b id="m_sexrate"></b></div>
       <div class="arrow">→ 안심망 배치·교육 타깃·<b>캠페인 시점</b></div>
     </div>
@@ -300,11 +308,11 @@
     </section>
   </div>
 
-  <!-- ===== 야간 여성안전 (CPTED) ===== -->
-  <div class="sec-title" id="cpted"><h3>야간 여성안전 — 조명 사각 × CPTED 후보지 (☎5838)</h3><span class="ln"></span></div>
+  <!-- ===== 야간 생활안전 (CPTED) ===== -->
+  <div class="sec-title" id="cpted"><h3>야간 생활안전 — 조명 사각 × CPTED 후보지 (☎5838)</h3><span class="ln"></span></div>
 
   <section class="card">
-    <h2>🧭 야간 여성안전 취약 삼각측량</h2>
+    <h2>🧭 야간 안전 취약 삼각측량</h2>
     <p class="desc">성범죄 좌표가 비공개이므로, 공개 가능한 <b>대리지표 3개를 겹쳐</b> 취약 지점을 추정합니다. 정답 골목을 찍는 게 아니라 <b>우선순위의 방향</b>을 만드는 논리입니다.</p>
     <div class="venn">
       <svg viewBox="0 0 380 250" width="100%" style="max-width:430px">
@@ -326,7 +334,7 @@
   </section>
 
   <section class="card">
-    <h2>💡 여성안심길 후보 지도 — 조명 사각 × 안심 인프라 공백</h2>
+    <h2>💡 안심길 후보 지도 — 조명 사각 × 안심 인프라 공백</h2>
     <p class="desc" id="lampDesc"></p>
     <div class="maptoggle" id="mapToggle"></div>
     <div class="mapwrap">
@@ -351,6 +359,10 @@
     <p class="desc">강남구 안전시설물 <b>848개</b>(OA21696)의 행정동 분포. 막대가 짧은 동이 시설이 상대적으로 적은 곳입니다. <b>※ 면적·유동인구 보정 전 절대량</b>이므로 ‘점검 후보 선별’ 용도로 보세요.</p>
     <div class="chartbox" style="height:340px"><canvas id="dongFacChart"></canvas></div>
     <p class="sowhat" id="dongFacSo"></p>
+    <h2 style="margin-top:22px">🔎 유형별 커버리지 진단 — 어느 동에 무엇이 비었나</h2>
+    <p class="desc">칸 색은 <b>각 시설 유형 안에서의 상대 충분도</b>(짙을수록 많음, 옅을수록 사각). 동 규모와 무관하게 ‘유형별 약한 동’을 가립니다.</p>
+    <div class="scroll"><table class="factab" id="facTab"></table></div>
+    <p class="sowhat" id="facTabSo"></p>
   </section>
 
   <section class="note">
@@ -358,7 +370,7 @@
   </section>
 
   <!-- ===== 참고: 타 부서 소관 ===== -->
-  <div class="sec-title"><h3>참고 · 거리질서(주차관리과 소관 — 여성안전 직접 무관)</h3><span class="ln"></span></div>
+  <div class="sec-title"><h3>참고 · 거리질서(주차관리과 소관 — 생활안전 직접 무관)</h3><span class="ln"></span></div>
   <div class="grid2 muted-sec">
     <section class="card">
       <h2>📍 주정차 위반 단속 — 행정동별 Top <span class="badge">참고</span></h2>
@@ -411,7 +423,7 @@ const valueLabel={id:"valueLabel",afterDatasetsDraw(chart){
   ctx.font='700 11px '+Chart.defaults.font.family;ctx.textBaseline="middle";ctx.fillStyle="#94a3b8";ctx.textAlign="left";
   m.data.forEach((b,i)=>{const v=ds.data[i];if(v)ctx.fillText(fmt(v),b.x+6,b.y);});ctx.restore();}};
 
-// ---- hero / insight / KPI (여성안전 관점) ----
+// ---- hero / insight / KPI (생활안전 관점) ----
 const SEX=byCrime["강간·강제추행"], THEFT=byCrime["절도"], LAMP=D.lamps.length, CROSS=(D.cross||[]).length;
 const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
 document.getElementById("heroCrime").textContent=fmt(SEX.발생)+"건";
@@ -515,6 +527,18 @@ new Chart(document.getElementById("gubunChart"),{
   });
   const low=[...df].sort((a,b)=>a.합계-b.합계).slice(0,3);
   document.getElementById("dongFacSo").innerHTML=`시설물이 가장 적은 동: <b>${low.map(d=>d.동+" "+d.합계+"개").join(" · ")}</b> → 보안등·안심벨 확충 검토 후보(면적·범죄 대비 점검 필요). 보안등이 전체의 ${(df.reduce((s,d)=>s+d.보안등,0)/df.reduce((s,d)=>s+d.합계,0)*100).toFixed(0)}%로 핵심 조명 인프라입니다.`;
+
+  // 유형별 커버리지 진단 표 (유형 내 상대 충분도)
+  const cols=[["보안등","보안등"],["CCTV","CCTV"],["112위치신고","112신고"],["안심벨","안심벨"]];
+  const maxOf={},minOf={};cols.forEach(([k])=>{const vs=df.map(d=>d[k]||0);maxOf[k]=Math.max(...vs);minOf[k]=Math.min(...vs);});
+  let h="<thead><tr><th class='l'>행정동</th>"+cols.map(c=>`<th>${c[1]}</th>`).join("")+"<th>합계</th></tr></thead><tbody>";
+  rows.forEach(d=>{h+=`<tr><td class='l'>${d.동}</td>`;
+    cols.forEach(([k])=>{const v=d[k]||0,t=maxOf[k]?v/maxOf[k]:0,isMin=v===minOf[k];
+      h+=`<td><div class='fcell${isMin?" min":""}' style="background:rgba(249,115,22,${(0.06+t*0.82).toFixed(2)});color:${t>0.55?"#0f172a":"#e6edf6"}">${v}</div></td>`;});
+    h+=`<td style="color:#cbd5e1;font-weight:700">${d.합계}</td></tr>`;});
+  document.getElementById("facTab").innerHTML=h+"</tbody>";
+  const weak=cols.map(([k,lbl])=>{const m=[...df].sort((a,b)=>(a[k]||0)-(b[k]||0))[0];return `<b>${lbl}</b> 최소 ${m.동}(${m[k]||0})`;});
+  document.getElementById("facTabSo").innerHTML=`유형별 최약 동(빨강 테두리) — ${weak.join(" · ")}. 해당 동에 그 시설을 우선 보강하면 강남구 전체 커버리지 균형이 빨리 잡힙니다. ※ 면적·인구 보정 전 절대수 기준.`;
 })();
 
 // ---- 서울 속 강남 벤치마크 ----
@@ -558,7 +582,7 @@ new Chart(document.getElementById("gubunChart"),{
   document.getElementById("rankSo").innerHTML=`강남·수서서는 31개 중 ${gnRanks.map(x=>`<b>${x.서} ${x.r}위</b>`).join(", ")} — 검거율 상위권이 아닙니다. 구청 예방사업으로 ‘발생 자체’를 줄여야 하는 근거.`;
 })();
 
-// ---- 여성안심 지도 (Leaflet + 격자 사각 탐지 + 레이어 토글) ----
+// ---- 안심 인프라 지도 (Leaflet + 격자 사각 탐지 + 레이어 토글) ----
 (function(){
   const lamps=D.lamps,sec=D.secLights||[],cross=D.cross||[],guard=D.guardian||[],deliv=D.delivery||[],bells=D.safebell||[],routes=D.saferoute||[],cctv=D.cctv||[],rep=D.report112||[];
   const pts=lamps.concat(sec);  // 조명 = 가로등 + 보안등(OA21696)
