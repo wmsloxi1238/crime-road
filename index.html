@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>강남구 안전 대시보드 — 5대범죄·주정차·가로등</title>
+<title>강남구 여성안심 현황 보드 — 가족정책팀 여성안전</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -172,6 +172,34 @@
     .closing .q{font-size:18px}
     .hl .big{font-size:24px}.kpi .v{font-size:24px}.mapwrap{height:320px}
   }
+  /* 판단 도구 컴포넌트 */
+  .sowhat{margin-top:14px;font-size:13px;color:#fdba74;background:rgba(249,115,22,.08);
+    border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:9px 12px;line-height:1.6}
+  .sowhat b{color:#fff} .sowhat::before{content:"판단 ▸ ";font-weight:800;color:var(--orange)}
+  .verdict{display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+    background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(26,36,56,.55))}
+  .verdict .vbig{flex:none;text-align:center;min-width:120px}
+  .verdict .vbig .r{font-size:40px;font-weight:800;color:#fb7185;line-height:1;letter-spacing:-.03em}
+  .verdict .vbig .of{font-size:13px;color:var(--muted);margin-top:4px}
+  .verdict .vtext{flex:1;min-width:240px;font-size:14px;color:#e6edf6;line-height:1.7}
+  .verdict .vtext b{color:#fff} .verdict .vtext .bad{color:#fb7185;font-weight:700} .verdict .vtext .good{color:#4ade80;font-weight:700}
+  .navbar{position:sticky;top:0;z-index:50;display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+    padding:10px 12px;margin:0 -4px;border-radius:14px;background:rgba(11,17,32,.82);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line)}
+  .navbar a{font-size:12px;font-weight:600;color:#aebcd2;text-decoration:none;padding:5px 11px;border-radius:999px;
+    border:1px solid transparent;transition:.15s;white-space:nowrap}
+  .navbar a:hover{color:#fff;background:rgba(249,115,22,.14);border-color:rgba(249,115,22,.35)}
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:100;
+    background:linear-gradient(90deg,#fb8b3c,#fdba74);box-shadow:0 0 10px rgba(251,139,60,.6)}
+  .maptoggle{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+  .maptoggle label{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#cbd5e1;cursor:pointer;
+    background:rgba(15,23,42,.6);border:1px solid var(--line);border-radius:999px;padding:5px 11px;user-select:none;transition:.15s}
+  .maptoggle label:hover{border-color:var(--line2)}
+  .maptoggle input{accent-color:var(--orange);cursor:pointer}
+  .maptoggle .sw{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .leaflet-control-layers{background:rgba(11,17,32,.9)!important;color:#e6edf6!important;border:1px solid var(--line)!important;border-radius:10px!important}
+  .leaflet-control-layers-list{color:#e6edf6}
+  [id]{scroll-margin-top:74px}
   /* 스크롤 등장 */
   .reveal{opacity:0;transform:translateY(16px)}
   .reveal.in{opacity:1;transform:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.7,.3,1)}
@@ -179,39 +207,33 @@
 </style>
 </head>
 <body>
+<div class="progress" id="progress"></div>
 <div class="wrap">
 
   <header class="hero">
-    <div class="tag"><span class="dot"></span> 복지생활국 가족정책과 · 가족정책팀 여성안전</div>
-    <h1>강남구는 지금, 안전한가?<br/><span style="font-size:21px;font-weight:700;color:var(--orange)">— 데이터로 여성안심을 설계하다</span></h1>
-    <p class="lead">한국은 개별 범죄의 좌표를 공개하지 않아 ‘위험한 골목’을 직접 알 수 없습니다. 이 보드는 흩어진 경찰·구청 공개데이터를 <b>교차검증·통합</b>해, <b>여성안심길·안심망·1인가구 안심·성폭력 예방</b> 사업의 입지·예산 근거로 번역합니다.</p>
+    <div class="tag"><span class="dot"></span> 가족정책팀 여성안전 · 2024 강남구</div>
+    <h1>여성안심 현황 보드</h1>
+    <p class="lead">안심길·안심망·1인가구 안심·성폭력 예방 사업의 <b>입지·예산을 판단</b>하기 위한 업무 화면입니다. 강남구 단위로 공개된 경찰·구청 데이터를 교차검증해 한 화면에 모았습니다.</p>
     <div class="hl">
       <span class="s">성범죄(강간·강제추행)</span>
       <span class="big" id="heroCrime"></span>
       <span class="s" id="heroRate"></span>
     </div>
-    <div class="trust">✓ <span><b>교차검증 완료</b> — 강남구 치안통계 = 강남·수서경찰서 관할 합 = 강력범죄 합 (의회·예산에서 반박되지 않는 단일 근거)</span></div>
+    <div class="trust">✓ <span><b>교차검증 완료</b> — 치안통계 = 강남·수서서 관할 합 = 강력범죄 합 (예산·의회 보고 시 그대로 인용 가능)</span></div>
   </header>
+
+  <nav class="navbar">
+    <a href="#bench">서울 속 강남</a>
+    <a href="#crime">5대범죄 현황</a>
+    <a href="#cpted">취약지·지도</a>
+  </nav>
 
   <div class="insight" id="insight"></div>
 
   <div class="kpis" id="kpis"></div>
 
-  <!-- ===== 왜 대시보드인가 (3대 문제 → 해결) ===== -->
-  <div class="sec-title"><h3>왜 ‘대시보드’인가 — 문제에 1:1로 대응</h3><span class="ln"></span></div>
-  <section class="card">
-    <h2>🧩 문제 → 해결 매핑</h2>
-    <p class="desc">데이터가 <b>없어서</b>가 아니라 <b>읽히지 않아서</b> 생긴 문제입니다. 해답은 데이터가 아니라 <b>형태</b>(대시보드)입니다.</p>
-    <div class="psmap">
-      <div class="psrow"><span class="p">① 범죄 좌표 비공개</span><span class="ar">→</span><span class="s"><b>시각적 중첩</b>(밀도지도+분포)으로 ‘조명 사각 × 위험’을 드러냄</span></div>
-      <div class="psrow"><span class="p">② 데이터 파편화(기관·CSV 제각각)</span><span class="ar">→</span><span class="s">통합·<b>자동계산</b>(검거율·비중) → 비전문가도 즉시 읽음</span></div>
-      <div class="psrow"><span class="p">③ 교차검증 불가</span><span class="ar">→</span><span class="s">한 번 만들어 <b>상시 재사용</b> → 반복 검증노동 제거</span></div>
-      <div class="psrow"><span class="p">④ 설득 근거 부재</span><span class="ar">→</span><span class="s"><b>한 장 시각 서사</b> → 의회·예산·기관협업 공용화면</span></div>
-    </div>
-  </section>
-
-  <!-- ===== 담당자별 의사결정 지원 ===== -->
-  <div class="sec-title"><h3>담당자별 의사결정 지원 — 가족정책팀 여성안전 4인</h3><span class="ln"></span></div>
+  <!-- ===== 담당별 핵심 지표 (4인 라우터) ===== -->
+  <div class="sec-title"><h3>담당별 핵심 지표 — 내 업무 바로보기</h3><span class="ln"></span></div>
   <div class="deces">
     <div class="dec">
       <div class="top"><span class="tel">☎ 5838</span><span class="job">여성안심길·안심계단·환경개선</span></div>
@@ -236,7 +258,7 @@
   </div>
 
   <!-- ===== 5대범죄 ===== -->
-  <div class="sec-title"><h3>5대범죄 · 발생과 검거</h3><span class="ln"></span></div>
+  <div class="sec-title" id="crime"><h3>5대범죄 · 발생과 검거</h3><span class="ln"></span></div>
 
   <div class="grid2">
     <section class="card">
@@ -257,18 +279,29 @@
     <div class="chartbox" style="height:240px"><canvas id="rateChart"></canvas></div>
   </section>
 
-  <section class="card">
-    <h2>🤝 왜 구청이 나서나 — 경찰 = 검거 / 구청 = 예방환경</h2>
-    <p class="desc">강간·강제추행 검거율은 이미 <b>83%</b> — 검거는 경찰이 잘합니다. 구청의 몫은 <b>발생 자체를 줄이는 환경개선(CPTED)</b>. 월권이 아니라 <b>예방 분업</b>입니다.</p>
-    <div class="split">
-      <div class="col police"><div class="h">👮 경찰 — 수사·검거</div><ul><li>범죄 수사·검거 (강간 83%)</li><li>순찰·단속·체포</li><li>사후 대응</li></ul></div>
-      <div class="vs">VS</div>
-      <div class="col gu"><div class="h">🏛️ 가족정책과 — 예방환경</div><ul><li>어두운 곳 밝히기(안심길·안심계단)</li><li>동행순찰·비상벨·지킴이집·택배함</li><li>사전 예방 — 이 화면이 그 입지 근거</li></ul></div>
-    </div>
+  <!-- ===== 서울 속 강남 벤치마크 ===== -->
+  <div class="sec-title" id="bench"><h3>서울 속 강남구 — 검거율 벤치마크 (판단)</h3><span class="ln"></span></div>
+  <section class="card verdict">
+    <div class="vbig"><span class="r" id="vrank"></span><div class="of" id="vof"></div></div>
+    <div class="vtext" id="vtext"></div>
   </section>
+  <div class="grid2">
+    <section class="card">
+      <h2>📊 강남구 vs 서울 평균 — 죄종별 검거율</h2>
+      <p class="desc">강남(주황)이 서울 평균(회색)보다 낮으면 <b>그 범죄는 강남이 상대적으로 약한 고리</b>입니다.</p>
+      <div class="chartbox" style="height:300px"><canvas id="benchCompareChart"></canvas></div>
+      <p class="sowhat" id="benchSo"></p>
+    </section>
+    <section class="card">
+      <h2>🏅 서울 31개 경찰서 검거율 분포</h2>
+      <p class="desc">강남·수서서가 서울 어디쯤인지 한눈에 — <b style="color:#fb8b3c">주황</b>이 강남·수서, 점선은 서울 평균.</p>
+      <div class="chartbox" style="height:300px"><canvas id="stationRankChart"></canvas></div>
+      <p class="sowhat" id="rankSo"></p>
+    </section>
+  </div>
 
   <!-- ===== 야간 여성안전 (CPTED) ===== -->
-  <div class="sec-title"><h3>야간 여성안전 — 조명 사각 × CPTED 후보지 (☎5838)</h3><span class="ln"></span></div>
+  <div class="sec-title" id="cpted"><h3>야간 여성안전 — 조명 사각 × CPTED 후보지 (☎5838)</h3><span class="ln"></span></div>
 
   <section class="card">
     <h2>🧭 야간 여성안전 취약 삼각측량</h2>
@@ -293,20 +326,23 @@
   </section>
 
   <section class="card">
-    <h2>💡 여성안심길 후보 지도 — 조명 사각 × 안심 인프라 공백 (가로등·바닥신호등·지킴이집·택배함)</h2>
+    <h2>💡 여성안심길 후보 지도 — 조명 사각 × 안심 인프라 공백</h2>
     <p class="desc" id="lampDesc"></p>
+    <div class="maptoggle" id="mapToggle"></div>
     <div class="mapwrap">
       <div id="lampMap"></div>
       <div class="maplegend">
         <span class="swatch" style="background:#fde68a"></span>가로등 <span id="lampN" style="color:#94a3b8"></span><br/>
         <span class="swatch" style="background:#34d399"></span>바닥신호등 <span id="crossN" style="color:#94a3b8"></span><br/>
-        <span class="swatch" style="background:#22d3ee"></span>여성안심지킴이집 <span id="guardN" style="color:#94a3b8"></span><br/>
+        <span class="swatch" style="background:#22d3ee"></span>지킴이집 <span id="guardN" style="color:#94a3b8"></span><br/>
         <span class="swatch" style="background:#f472b6"></span>안심택배함 <span id="delivN" style="color:#94a3b8"></span><br/>
         <span class="swatch" style="background:#ef4444"></span>안심벨 <span id="bellN" style="color:#94a3b8"></span><br/>
         <span class="swatch" style="background:#fb923c;border-radius:2px"></span>안심귀갓길 <span id="routeN" style="color:#94a3b8"></span><br/>
-        <span style="color:#94a3b8">어두운 영역 = 조명 사각 · 인프라 마커 없는 곳 = 안심 공백</span>
+        <span class="swatch" style="background:rgba(239,68,68,.55);border-radius:2px"></span>최우선 후보셀 <span id="gapN" style="color:#94a3b8"></span><br/>
+        <span style="color:#94a3b8">빨강 셀 = 조명 사각 + 안심 인프라 0</span>
       </div>
     </div>
+    <p class="sowhat" id="mapSo"></p>
   </section>
 
   <!-- ===== 참고: 서울/전국 장소 패턴 ===== -->
@@ -326,46 +362,7 @@
   </div>
 
   <section class="note">
-    <b>이 보드의 성격 — ‘운영 콘솔’이 아니라 ‘설득 근거 보드’</b><br/>
-    강남구의 <b>범죄는 ‘구 전체·죄종별’까지만 공개</b>되고 동·골목 단위는 없습니다(개인정보 보호). 따라서 <b>“어느 동·골목에 먼저”의 마지막 한 칸은 못 채웁니다.</b> 이 화면은 매일 켜는 운영 콘솔이 아니라, <b>연·분기 사업계획·예산·의회·기관협업을 설득하는 근거 보드</b>입니다(설득가치 ↑, 현장 운영가치는 제한적). ‘참고’ 섹션의 장소별 패턴은 강남 분리가 불가능한 서울/전국 집계입니다.
-  </section>
-
-  <section class="card">
-    <h2>⚖️ 이 보드의 가치 — 운영 vs 설득 (종합 66/100)</h2>
-    <p class="desc">동·골목 단위가 없어 ‘매일 켜는 운영 콘솔’ 가치는 제한적이지만, 흩어진 데이터를 교차검증·통합해 <b>의회·예산·기관협업을 설득하는 근거</b>로서의 가치가 큽니다. 한계를 먼저 인정하고 그 강점에 집중합니다.</p>
-    <div class="vbar">
-      <div class="row"><div class="lab"><span>현장 운영가치 (매일·동별 의사결정)</span><span>52</span></div><div class="track"><div class="fill" style="width:52%;background:#64748b"></div></div></div>
-      <div class="row"><div class="lab"><span>설득·근거 가치 (사업기획·예산·협업)</span><span>89</span></div><div class="track"><div class="fill" style="width:89%;background:linear-gradient(90deg,#f97316,#fdba74)"></div></div></div>
-    </div>
-  </section>
-
-  <!-- ===== 로드맵 Now→Next→Goal ===== -->
-  <div class="sec-title"><h3>발전 방향 — 66점에서 100점으로</h3><span class="ln"></span></div>
-  <section class="card">
-    <h2>🧭 로드맵 (Now → Next → Goal)</h2>
-    <p class="desc">소관 데이터와 해상도를 높이면 ‘설득 도구’가 <b>현장 입지 도구</b>로 진화합니다.</p>
-    <div class="stages">
-      <div class="stage now"><span class="tag2">NOW · 반영됨</span><h4>강남구 단위 통합 + 여성안심 인프라</h4><p>5대범죄·검거율 + 가로등·바닥신호등 + <b style="color:#22d3ee">지킴이집 116·택배함 7</b> + <b style="color:#fb923c">안심귀갓길 24노선·안심벨 89</b> 중첩 지도 + 교차검증 배지</p></div>
-      <div class="stage next"><span class="tag2">NEXT · 보완</span><h4>동·골목 해상도</h4><p>동별 성범죄 / 범죄주의구간(15101797, 도로 10등급) · 스카우트 6개 동 운영범위 · 성범죄 시간대·요일</p></div>
-      <div class="stage goal"><span class="tag2">GOAL · 100점</span><h4>현장 입지 도구</h4><p>“어느 동·골목에 먼저”까지 답 → 안심길·스카우트 <b>동 선정</b>·예산 배분의 직접 근거</p></div>
-    </div>
-  </section>
-
-  <!-- ===== 기대 효과 ===== -->
-  <section class="card">
-    <h2>📈 기대 효과 — 감(感)에서 근거로</h2>
-    <p class="desc">데이터가 예산·사업·협업으로 실제 전환됩니다. (정량 효과는 보완 데이터 확보 후 측정 가능)</p>
-    <div class="ba">
-      <div class="col before"><div class="h">BEFORE</div><ul><li>민원·체감에 의존한 사업 입지</li><li>예산·의회 설득 근거 부족</li><li>기관별 데이터 제각각·반복 검증</li></ul></div>
-      <div class="vs">→</div>
-      <div class="col after"><div class="h">AFTER</div><ul><li>조명 사각 × 성범죄 <b>근거 기반</b> 배치</li><li>교차검증된 <b>한 장 설득 화면</b></li><li>경찰·도로과 <b>협업 공용 보드</b></li></ul></div>
-    </div>
-  </section>
-
-  <!-- ===== 맺음 ===== -->
-  <section class="closing">
-    <div class="q">“불안을 <b>근거</b>로 번역하는 다리.<br/>그 다리가 가장 필요한 사람은 <b>가족정책팀 여성안전 4인</b>이다.”</div>
-    <div class="sub">강남구 생활안전 대시보드 · 다음 단계 = 동별 성범죄·안심 인프라 좌표 연동</div>
+    <b>데이터 범위</b> — 강남구 범죄는 <b>구 전체·죄종별</b>까지만 공개되고 동·골목 단위는 비공개입니다(개인정보 보호). 지도의 ‘최우선 후보 셀’은 가로등·안심 인프라 좌표로 추정한 것이며, <b>동별 성범죄·범죄주의구간(15101797, 도로 10등급)</b>을 확보하면 동·골목 정밀도로 확장됩니다. ‘참고’ 섹션의 장소별 패턴은 강남 분리가 불가능한 서울/전국 집계입니다.
   </section>
 
   <!-- ===== 참고: 타 부서 소관 ===== -->
@@ -535,40 +532,105 @@ new Chart(document.getElementById("nationPlaceChart"),{
   plugins:[valueLabel]}
 });
 
-// ---- 가로등 밀도 지도 (Leaflet + heat) ----
+// ---- 서울 속 강남 벤치마크 ----
+(function(){
+  const SC=D.seoulCrime, SB=D.seoulBench, st=D.stations;
+  if(!SC||!SB||!st){return;}
+  document.getElementById("vrank").textContent=SB.강남구순위+"위";
+  document.getElementById("vof").textContent=`서울 ${SB.서수}개 경찰서 중`;
+  const sexGap=(SEX.검거율-SC["강간·강제추행"].검거율).toFixed(1);
+  const theftGap=(SC["절도"].검거율-THEFT.검거율).toFixed(1);
+  document.getElementById("vtext").innerHTML=
+    `강남구 5대범죄 검거율 <b>${SB.강남구검거율}%</b>는 서울 평균 <b>${SB.검거율}%</b>보다 낮은 <span class="bad">하위권</span>입니다. 특히 <b>절도 검거율 ${THEFT.검거율}%</b>는 서울 평균 ${SC["절도"].검거율}%보다 <span class="bad">${theftGap}%p 낮아</span> 1인가구 방범(☎5814)의 핵심 근거입니다. 반면 <b>성범죄 검거율 ${SEX.검거율}%</b>는 서울 평균 ${SC["강간·강제추행"].검거율}%보다 <span class="good">+${sexGap}%p 높아</span>, 구청의 몫은 검거가 아니라 <b>예방환경</b>임을 재확인합니다.`;
+  const cmp=["폭력","절도","강간·강제추행","강도"];
+  new Chart(document.getElementById("benchCompareChart"),{
+    type:"bar",
+    data:{labels:cmp,datasets:[
+      {label:"강남구",data:cmp.map(c=>byCrime[c].검거율),backgroundColor:"#fb8b3c",borderRadius:4},
+      {label:"서울 평균",data:cmp.map(c=>SC[c].검거율),backgroundColor:"#64748b",borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{...baseScale.y,beginAtZero:true,max:100,ticks:{color:"#cbd5e1",callback:v=>v+"%"}},x:{grid:{display:false},ticks:{color:"#cbd5e1"}}},
+      plugins:{legend:{labels:{boxWidth:12}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y}%`}}}}
+  });
+  const gaps=cmp.filter(c=>byCrime[c].검거율<SC[c].검거율);
+  document.getElementById("benchSo").innerHTML=`강남이 서울 평균보다 낮은 범죄: <b>${gaps.join(", ")||"없음"}</b> → 예방·방범 자원의 우선 투입 후보.`;
+  const sorted=[...st].sort((a,b)=>b.검거율-a.검거율);
+  const avgLine={id:"avgLine",afterDraw(ch){const y=ch.scales.y.getPixelForValue(SB.검거율);const{ctx,chartArea:a}=ch;
+    ctx.save();ctx.strokeStyle="#e2e8f0";ctx.setLineDash([5,4]);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.left,y);ctx.lineTo(a.right,y);ctx.stroke();
+    ctx.setLineDash([]);ctx.fillStyle="#e2e8f0";ctx.font="700 10px "+Chart.defaults.font.family;ctx.fillText("서울평균 "+SB.검거율+"%",a.left+4,y-4);ctx.restore();}};
+  new Chart(document.getElementById("stationRankChart"),{
+    type:"bar",
+    data:{labels:sorted.map(s=>s.서),datasets:[{data:sorted.map(s=>s.검거율),
+      backgroundColor:sorted.map(s=>s.gn?"#fb8b3c":"#475569"),borderRadius:2}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{...baseScale.y,beginAtZero:false,ticks:{color:"#cbd5e1",callback:v=>v+"%"}},
+        x:{grid:{display:false},ticks:{color:"#fb8b3c",font:{size:9,weight:700},maxRotation:90,minRotation:90,autoSkip:false,
+          callback:function(v){const l=this.getLabelForValue(v);return(l==="강남"||l==="수서")?l:"";}}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{title:c=>c[0].label+"서",label:c=>` 검거율 ${c.parsed.y}%`}}},
+    plugins:[avgLine]}
+  });
+  const gnRanks=sorted.map((s,i)=>s.gn?{서:s.서,r:i+1}:null).filter(Boolean);
+  document.getElementById("rankSo").innerHTML=`강남·수서서는 31개 중 ${gnRanks.map(x=>`<b>${x.서} ${x.r}위</b>`).join(", ")} — 검거율 상위권이 아닙니다. 구청 예방사업으로 ‘발생 자체’를 줄여야 하는 근거.`;
+})();
+
+// ---- 여성안심 지도 (Leaflet + 격자 사각 탐지 + 레이어 토글) ----
 (function(){
   const pts=D.lamps,cross=D.cross||[],guard=D.guardian||[],deliv=D.delivery||[],bells=D.safebell||[],routes=D.saferoute||[];
-  document.getElementById("lampN").textContent=`${fmt(pts.length)}개`;
-  document.getElementById("crossN").textContent=`${fmt(cross.length)}개`;
-  document.getElementById("guardN").textContent=`${fmt(guard.length)}개`;
-  document.getElementById("delivN").textContent=`${fmt(deliv.length)}개`;
-  document.getElementById("bellN").textContent=`${fmt(bells.length)}개`;
-  document.getElementById("routeN").textContent=`${fmt(routes.length)}개 노선`;
-  document.getElementById("lampDesc").innerHTML=`강남구 일대 가로등 <b>${fmt(pts.length)}개</b>·바닥신호등 <b>${fmt(cross.length)}개</b> 위에, <b style="color:#fb923c">안심귀갓길 ${fmt(routes.length)}개 노선</b>·<b style="color:#ef4444">안심벨 ${fmt(bells.length)}개</b>·<b style="color:#22d3ee">지킴이집 ${fmt(guard.length)}개</b>·<b style="color:#f472b6">택배함 ${fmt(deliv.length)}개</b>(가족정책과 직접 소관)를 겹쳤습니다. <b style="color:#fdba74">조명이 어두우면서 안심귀갓길·안심벨이 닿지 않는 영역이 여성안심길·안심벨 확충 1순위 후보</b>입니다(☎5838·5814). ※ 동별 성범죄·범죄주의구간(15101797)을 얹으면 후보지가 더 또렷해집니다.`;
-  if(typeof L==="undefined"){document.getElementById("lampDesc").textContent+=" (지도 라이브러리 로드 실패 — 인터넷 연결 필요)";return;}
+  const $=id=>document.getElementById(id);
+  $("lampN").textContent=`${fmt(pts.length)}개`; $("crossN").textContent=`${fmt(cross.length)}개`;
+  $("guardN").textContent=`${fmt(guard.length)}개`; $("delivN").textContent=`${fmt(deliv.length)}개`;
+  $("bellN").textContent=`${fmt(bells.length)}개`; $("routeN").textContent=`${fmt(routes.length)}개 노선`;
+
+  // 격자 기반 조명 사각 + 인프라 공백 탐지
+  const b=D.lampBbox, COLS=18, ROWS=12;
+  const cLa=(b.maxLa-b.minLa)/ROWS, cLo=(b.maxLo-b.minLo)/COLS;
+  const ix=(la,lo)=>{const r=Math.floor((la-b.minLa)/cLa),c=Math.floor((lo-b.minLo)/cLo);
+    return(r<0||r>=ROWS||c<0||c>=COLS)?null:r*COLS+c;};
+  const lampC=Array(ROWS*COLS).fill(0), infraC=Array(ROWS*COLS).fill(0);
+  pts.forEach(p=>{const i=ix(p[0],p[1]);if(i!=null)lampC[i]++;});
+  [...guard,...deliv,...bells].forEach(p=>{const i=ix(p[0],p[1]);if(i!=null)infraC[i]++;});
+  routes.forEach(line=>line.forEach(p=>{const i=ix(p[0],p[1]);if(i!=null)infraC[i]++;}));
+  const active=lampC.filter(v=>v>0); const mean=active.reduce((s,v)=>s+v,0)/(active.length||1);
+  const lowT=mean*0.4, cells=[];
+  for(let i=0;i<ROWS*COLS;i++){const lamp=lampC[i];
+    if(lamp>0&&lamp<lowT)cells.push({r:Math.floor(i/COLS),c:i%COLS,lamp,infra:infraC[i],gap:infraC[i]===0});}
+  const gapCells=cells.filter(x=>x.gap);
+  $("gapN").textContent=`${gapCells.length}곳`;
+  $("lampDesc").innerHTML=`가로등 <b>${fmt(pts.length)}</b>·바닥신호등 <b>${fmt(cross.length)}</b> 위에 안심귀갓길 <b>${fmt(routes.length)}노선</b>·안심벨 <b>${fmt(bells.length)}</b>·지킴이집 <b>${fmt(guard.length)}</b>·택배함 <b>${fmt(deliv.length)}</b>를 겹치고, 격자로 <b style="color:#fb7185">조명 사각 + 인프라 공백 셀</b>을 자동 탐지했습니다. 아래 토글로 레이어를 켜고 끄세요.`;
+  $("mapSo").innerHTML=`격자 분석: <b>조명 사각 후보 ${cells.length}곳</b> 중 <b style="color:#fb7185">안심 인프라가 0인 ‘최우선 후보’ ${gapCells.length}곳</b>. 여기에 안심벨·지킴이집·안심길을 먼저 깔면 비용 대비 야간 안전 효과가 큽니다. (격자 ${ROWS}×${COLS} · 가로등 밀도 평균 40% 미만 셀)`;
+
+  if(typeof L==="undefined"){$("lampDesc").innerHTML="(지도 라이브러리 로드 실패 — 인터넷 연결 필요)";return;}
   const map=L.map("lampMap",{zoomControl:true,attributionControl:true,scrollWheelZoom:false});
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    {maxZoom:19,subdomains:"abcd",attribution:'© OpenStreetMap · © CARTO'}).addTo(map);
-  L.heatLayer(pts.map(p=>[p[0],p[1],0.7]),
-    {radius:12,blur:15,minOpacity:.3,maxZoom:16,
-     gradient:{0.2:"#6d28d9",0.45:"#d97706",0.7:"#f59e0b",1:"#fde68a"}}).addTo(map);
-  cross.forEach(p=>L.circleMarker([p[0],p[1]],
-    {radius:4,color:"#064e3b",weight:1,fillColor:"#34d399",fillOpacity:.95}).addTo(map));
-  guard.forEach(p=>L.circleMarker([p[0],p[1]],
-    {radius:5,color:"#0e7490",weight:1.5,fillColor:"#22d3ee",fillOpacity:.95}).addTo(map)
-    .bindTooltip(`🛡️ 여성안심지킴이집<br>${p[2]||""}`,{direction:"top"}));
-  deliv.forEach(p=>L.circleMarker([p[0],p[1]],
-    {radius:7,color:"#9d174d",weight:1.5,fillColor:"#f472b6",fillOpacity:.95}).addTo(map)
-    .bindTooltip(`📦 안심택배함<br>${p[2]||""}`,{direction:"top"}));
-  routes.forEach(line=>L.polyline(line,{color:"#fb923c",weight:3,opacity:.75}).addTo(map)
-    .bindTooltip("🛡️ 안심귀갓길",{sticky:true}));
-  bells.forEach(p=>L.circleMarker([p[0],p[1]],
-    {radius:5,color:"#7f1d1d",weight:1.5,fillColor:"#ef4444",fillOpacity:.95}).addTo(map)
-    .bindTooltip("🔔 안심벨",{direction:"top"}));
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:19,subdomains:"abcd",attribution:'© OpenStreetMap · © CARTO'}).addTo(map);
+  const Lheat=L.heatLayer(pts.map(p=>[p[0],p[1],0.7]),{radius:12,blur:15,minOpacity:.3,maxZoom:16,gradient:{0.2:"#6d28d9",0.45:"#d97706",0.7:"#f59e0b",1:"#fde68a"}});
+  const Lcross=L.layerGroup(cross.map(p=>L.circleMarker([p[0],p[1]],{radius:4,color:"#064e3b",weight:1,fillColor:"#34d399",fillOpacity:.95})));
+  const Lguard=L.layerGroup(guard.map(p=>L.circleMarker([p[0],p[1]],{radius:5,color:"#0e7490",weight:1.5,fillColor:"#22d3ee",fillOpacity:.95}).bindTooltip(`🛡️ 지킴이집<br>${p[2]||""}`,{direction:"top"})));
+  const Ldeliv=L.layerGroup(deliv.map(p=>L.circleMarker([p[0],p[1]],{radius:7,color:"#9d174d",weight:1.5,fillColor:"#f472b6",fillOpacity:.95}).bindTooltip(`📦 안심택배함<br>${p[2]||""}`,{direction:"top"})));
+  const Lbell=L.layerGroup(bells.map(p=>L.circleMarker([p[0],p[1]],{radius:5,color:"#7f1d1d",weight:1.5,fillColor:"#ef4444",fillOpacity:.95}).bindTooltip("🔔 안심벨",{direction:"top"})));
+  const Lroute=L.layerGroup(routes.map(line=>L.polyline(line,{color:"#fb923c",weight:3,opacity:.75}).bindTooltip("🛡️ 안심귀갓길",{sticky:true})));
+  const Lgap=L.layerGroup(cells.map(x=>{const la1=b.minLa+x.r*cLa,lo1=b.minLo+x.c*cLo;
+    return L.rectangle([[la1,lo1],[la1+cLa,lo1+cLo]],{color:x.gap?"#ef4444":"#f59e0b",weight:1,fillColor:x.gap?"#ef4444":"#f59e0b",fillOpacity:x.gap?.32:.15})
+      .bindTooltip(x.gap?"⚠️ 최우선 후보 (조명 사각 + 안심 인프라 0)":"조명 사각 (인프라 일부 있음)",{sticky:true});}));
+  const layers={"가로등 밀도":Lheat,"바닥신호등":Lcross,"지킴이집":Lguard,"안심택배함":Ldeliv,"안심벨":Lbell,"안심귀갓길":Lroute,"사각·공백 셀":Lgap};
+  const colorOf={"가로등 밀도":"#fde68a","바닥신호등":"#34d399","지킴이집":"#22d3ee","안심택배함":"#f472b6","안심벨":"#ef4444","안심귀갓길":"#fb923c","사각·공백 셀":"#ef4444"};
+  [Lheat,Lguard,Lbell,Lroute,Lgap].forEach(l=>l.addTo(map));
+  const tg=$("mapToggle");
+  Object.keys(layers).forEach(name=>{
+    const lab=document.createElement("label");
+    lab.innerHTML=`<input type="checkbox" ${map.hasLayer(layers[name])?"checked":""}><span class="sw" style="background:${colorOf[name]}"></span>${name}`;
+    lab.querySelector("input").addEventListener("change",e=>{e.target.checked?layers[name].addTo(map):map.removeLayer(layers[name]);});
+    tg.appendChild(lab);
+  });
   const bounds=L.latLngBounds(pts.map(p=>[p[0],p[1]]));
   map.fitBounds(bounds,{padding:[20,20]});
   setTimeout(()=>map.invalidateSize(),200);
 })();
+
+// ---- 스크롤 진행바 ----
+(function(){const p=document.getElementById("progress");if(!p)return;
+  const upd=()=>{const h=document.documentElement,max=h.scrollHeight-h.clientHeight;
+    p.style.width=(max>0?h.scrollTop/max*100:0)+"%";};
+  document.addEventListener("scroll",upd,{passive:true});window.addEventListener("resize",upd);upd();})();
 
 // ---- 스크롤 등장 효과 ----
 (function(){
