@@ -87,8 +87,61 @@
     color:#d8b4fe;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
   .road b{color:#fff}
   .muted-sec .card{opacity:.82}
+  /* PPT 서사 컴포넌트 */
+  .psmap{display:flex;flex-direction:column;gap:8px}
+  .psrow{display:grid;grid-template-columns:1fr auto 1.4fr;align-items:center;gap:10px;
+    background:rgba(15,23,42,.5);border:1px solid var(--line);border-radius:12px;padding:11px 14px}
+  .psrow .p{font-size:13px;color:#fca5a5;font-weight:600}
+  .psrow .ar{color:var(--orange);font-weight:800}
+  .psrow .s{font-size:13px;color:#cbd5e1}
+  .psrow .s b{color:#fff}
+  @media(max-width:620px){.psrow{grid-template-columns:1fr;gap:4px}.psrow .ar{display:none}}
+  .venn{display:flex;justify-content:center;padding:6px 0 2px}
+  .vleg{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;font-size:12.5px;color:#cbd5e1;margin-top:6px}
+  .vleg span{display:inline-flex;align-items:center;gap:6px}
+  .vleg i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .split{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch}
+  .split .col{padding:14px 16px}
+  .split .vs{display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:800;font-size:13px;padding:0 4px}
+  .split .h{font-size:13px;font-weight:800;margin-bottom:8px}
+  .split .police .h{color:#60a5fa} .split .gu .h{color:var(--green)}
+  .split ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .split li{font-size:12.5px;color:#cbd5e1;display:flex;gap:7px}
+  .split li::before{content:"·";color:var(--muted)}
+  .split .police{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.25);border-radius:12px}
+  .split .gu{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.25);border-radius:12px}
+  @media(max-width:620px){.split{grid-template-columns:1fr;gap:8px}.split .vs{padding:2px}}
+  .vbar{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+  .vbar .row .lab{display:flex;justify-content:space-between;font-size:12.5px;color:#cbd5e1;margin-bottom:5px}
+  .vbar .track{height:14px;background:rgba(15,23,42,.7);border-radius:8px;overflow:hidden}
+  .vbar .fill{height:100%;border-radius:8px}
+  .stages{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:760px){.stages{grid-template-columns:repeat(3,1fr)}}
+  .stage{border:1px solid var(--line);border-radius:14px;padding:14px;background:rgba(15,23,42,.5)}
+  .stage .tag2{display:inline-block;font-size:11px;font-weight:800;border-radius:6px;padding:2px 8px;margin-bottom:8px}
+  .stage.now .tag2{background:rgba(34,197,94,.2);color:#86efac} .stage.now{border-color:rgba(34,197,94,.4)}
+  .stage.next .tag2{background:rgba(234,179,8,.2);color:#fde68a}
+  .stage.goal .tag2{background:rgba(168,85,247,.2);color:#d8b4fe}
+  .stage h4{font-size:13.5px;color:#fff;margin-bottom:6px}
+  .stage p{font-size:12.5px;color:#cbd5e1}
+  .ba{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch}
+  .ba .col{padding:14px 16px;border-radius:12px}
+  .ba .before{background:rgba(100,116,139,.1);border:1px solid var(--line)}
+  .ba .after{background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.3)}
+  .ba .vs{display:flex;align-items:center;justify-content:center;color:var(--orange);font-weight:800;padding:0 8px}
+  .ba .h{font-size:12px;font-weight:800;color:var(--muted);margin-bottom:6px}
+  .ba .after .h{color:var(--orange)}
+  .ba ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+  .ba li{font-size:12.5px;color:#cbd5e1}
+  @media(max-width:620px){.ba{grid-template-columns:1fr;gap:8px}}
+  .closing{text-align:center;padding:34px 24px;border:1px solid rgba(249,115,22,.35);border-radius:20px;
+    background:radial-gradient(120% 140% at 50% 0%, rgba(249,115,22,.15), rgba(15,23,42,.4) 60%)}
+  .closing .q{font-size:22px;font-weight:800;color:#fff;line-height:1.4;max-width:640px;margin:0 auto}
+  .closing .q b{color:var(--orange)}
+  .closing .sub{font-size:13px;color:var(--muted);margin-top:12px}
   @media(max-width:560px){
     h1{font-size:26px}.hero{padding:24px 18px}.wrap{padding:16px 12px 40px;gap:16px}
+    .closing .q{font-size:18px}
     .hl .big{font-size:24px}.kpi .v{font-size:24px}.mapwrap{height:320px}
   }
 </style>
@@ -98,7 +151,7 @@
 
   <header class="hero">
     <div class="tag"><span class="dot"></span> 복지생활국 가족정책과 · 가족정책팀 여성안전</div>
-    <h1>여성안심 사업, 어디에·왜·얼마로</h1>
+    <h1>강남구는 지금, 안전한가?<br/><span style="font-size:21px;font-weight:700;color:var(--orange)">— 데이터로 여성안심을 설계하다</span></h1>
     <p class="lead">한국은 개별 범죄의 좌표를 공개하지 않아 ‘위험한 골목’을 직접 알 수 없습니다. 이 보드는 흩어진 경찰·구청 공개데이터를 <b>교차검증·통합</b>해, <b>여성안심길·안심망·1인가구 안심·성폭력 예방</b> 사업의 입지·예산 근거로 번역합니다.</p>
     <div class="hl">
       <span class="s">성범죄(강간·강제추행)</span>
@@ -111,6 +164,19 @@
   <div class="insight" id="insight"></div>
 
   <div class="kpis" id="kpis"></div>
+
+  <!-- ===== 왜 대시보드인가 (3대 문제 → 해결) ===== -->
+  <div class="sec-title"><h3>왜 ‘대시보드’인가 — 문제에 1:1로 대응</h3><span class="ln"></span></div>
+  <section class="card">
+    <h2>🧩 문제 → 해결 매핑</h2>
+    <p class="desc">데이터가 <b>없어서</b>가 아니라 <b>읽히지 않아서</b> 생긴 문제입니다. 해답은 데이터가 아니라 <b>형태</b>(대시보드)입니다.</p>
+    <div class="psmap">
+      <div class="psrow"><span class="p">① 범죄 좌표 비공개</span><span class="ar">→</span><span class="s"><b>시각적 중첩</b>(밀도지도+분포)으로 ‘조명 사각 × 위험’을 드러냄</span></div>
+      <div class="psrow"><span class="p">② 데이터 파편화(기관·CSV 제각각)</span><span class="ar">→</span><span class="s">통합·<b>자동계산</b>(검거율·비중) → 비전문가도 즉시 읽음</span></div>
+      <div class="psrow"><span class="p">③ 교차검증 불가</span><span class="ar">→</span><span class="s">한 번 만들어 <b>상시 재사용</b> → 반복 검증노동 제거</span></div>
+      <div class="psrow"><span class="p">④ 설득 근거 부재</span><span class="ar">→</span><span class="s"><b>한 장 시각 서사</b> → 의회·예산·기관협업 공용화면</span></div>
+    </div>
+  </section>
 
   <!-- ===== 담당자별 의사결정 지원 ===== -->
   <div class="sec-title"><h3>담당자별 의사결정 지원 — 가족정책팀 여성안전 4인</h3><span class="ln"></span></div>
@@ -159,16 +225,38 @@
     <div class="chartbox" style="height:240px"><canvas id="rateChart"></canvas></div>
   </section>
 
+  <section class="card">
+    <h2>🤝 왜 구청이 나서나 — 경찰 = 검거 / 구청 = 예방환경</h2>
+    <p class="desc">강간·강제추행 검거율은 이미 <b>83%</b> — 검거는 경찰이 잘합니다. 구청의 몫은 <b>발생 자체를 줄이는 환경개선(CPTED)</b>. 월권이 아니라 <b>예방 분업</b>입니다.</p>
+    <div class="split">
+      <div class="col police"><div class="h">👮 경찰 — 수사·검거</div><ul><li>범죄 수사·검거 (강간 83%)</li><li>순찰·단속·체포</li><li>사후 대응</li></ul></div>
+      <div class="vs">VS</div>
+      <div class="col gu"><div class="h">🏛️ 가족정책과 — 예방환경</div><ul><li>어두운 곳 밝히기(안심길·안심계단)</li><li>동행순찰·비상벨·지킴이집·택배함</li><li>사전 예방 — 이 화면이 그 입지 근거</li></ul></div>
+    </div>
+  </section>
+
   <!-- ===== 야간 여성안전 (CPTED) ===== -->
   <div class="sec-title"><h3>야간 여성안전 — 조명 사각 × CPTED 후보지 (☎5838)</h3><span class="ln"></span></div>
 
   <section class="card">
     <h2>🧭 야간 여성안전 취약 삼각측량</h2>
-    <p class="desc">성범죄 좌표가 비공개이므로, 공개 가능한 <b>대리지표 3개를 겹쳐</b> 취약 지점을 추정합니다. 이 삼각측량이 안심길·비상벨·동행순찰의 입지 논리입니다.</p>
-    <div class="tri">
-      <div class="t"><div class="h">① 성범죄 규모</div><div class="b">강간·강제추행 <b id="m_sexA"></b> — 야간·보행 취약의 핵심 신호</div></div>
-      <div class="t"><div class="h">② 조명 사각</div><div class="b">가로등 <b id="m_lampA"></b>의 빈 영역 = 야간 우범 환경 후보</div></div>
-      <div class="t"><div class="h">③ 절도 압력</div><div class="b">절도 검거율 <b id="m_theftrateA"></b> — 생활범죄 노출도 보조지표</div></div>
+    <p class="desc">성범죄 좌표가 비공개이므로, 공개 가능한 <b>대리지표 3개를 겹쳐</b> 취약 지점을 추정합니다. 정답 골목을 찍는 게 아니라 <b>우선순위의 방향</b>을 만드는 논리입니다.</p>
+    <div class="venn">
+      <svg viewBox="0 0 380 250" width="100%" style="max-width:430px">
+        <circle cx="150" cy="98" r="74" fill="#f97316" fill-opacity=".28" stroke="#f97316" stroke-opacity=".7"/>
+        <circle cx="230" cy="98" r="74" fill="#22d3ee" fill-opacity=".24" stroke="#22d3ee" stroke-opacity=".7"/>
+        <circle cx="190" cy="168" r="74" fill="#3b82f6" fill-opacity=".24" stroke="#3b82f6" stroke-opacity=".7"/>
+        <text x="112" y="58" fill="#fdba74" font-size="12.5" font-weight="700" text-anchor="middle">성범죄</text>
+        <text x="268" y="58" fill="#67e8f9" font-size="12.5" font-weight="700" text-anchor="middle">조명 사각</text>
+        <text x="190" y="232" fill="#93c5fd" font-size="12.5" font-weight="700" text-anchor="middle">절도 압력</text>
+        <text x="190" y="118" fill="#fff" font-size="13" font-weight="800" text-anchor="middle">취약지</text>
+        <text x="190" y="134" fill="#e2e8f0" font-size="9.5" text-anchor="middle">(우선순위)</text>
+      </svg>
+    </div>
+    <div class="vleg">
+      <span><i style="background:#f97316"></i>성범죄 강간·강제추행 <b id="m_sexA" style="color:#fff"></b></span>
+      <span><i style="background:#22d3ee"></i>가로등 <b id="m_lampA" style="color:#fff"></b>의 사각</span>
+      <span><i style="background:#3b82f6"></i>절도 검거율 <b id="m_theftrateA" style="color:#fff"></b></span>
     </div>
   </section>
 
@@ -208,16 +296,42 @@
     강남구의 <b>범죄는 ‘구 전체·죄종별’까지만 공개</b>되고 동·골목 단위는 없습니다(개인정보 보호). 따라서 <b>“어느 동·골목에 먼저”의 마지막 한 칸은 못 채웁니다.</b> 이 화면은 매일 켜는 운영 콘솔이 아니라, <b>연·분기 사업계획·예산·의회·기관협업을 설득하는 근거 보드</b>입니다(설득가치 ↑, 현장 운영가치는 제한적). ‘참고’ 섹션의 장소별 패턴은 강남 분리가 불가능한 서울/전국 집계입니다.
   </section>
 
-  <!-- ===== 100점 로드맵 ===== -->
-  <div class="sec-title"><h3>현장 입지 도구(100점)로 가는 다음 데이터</h3><span class="ln"></span></div>
   <section class="card">
-    <h2>🧩 보완 로드맵 (우선순위)</h2>
-    <p class="desc">아래를 얹으면 ‘설득 도구’를 넘어 <b>동·골목 단위 현장 입지 도구</b>가 됩니다.</p>
-    <ul class="road">
-      <li><span class="n">1</span><span><b>동별 성범죄 / 범죄주의구간(15101797 WMS, 도로 10등급)</b> — 구→동·골목 해상도 ↑ → 안심길·스카우트 <b>동 선정</b> 가능</span></li>
-      <li><span class="n" style="background:#22c55e">✓</span><span><b>여성안심 인프라 좌표</b> — <b style="color:#22d3ee">지킴이집 116개·택배함 7개 반영 완료</b>(위 지도). 남은 것: 안심길·비상벨·스카우트 6개 동 → 가족정책과 직접 소관 공백·성과 점검</span></li>
-      <li><span class="n">3</span><span><b>성범죄 시간대·요일</b> — 스카우트 운영시간·교육 시점 결정</span></li>
-    </ul>
+    <h2>⚖️ 이 보드의 가치 — 운영 vs 설득 (종합 66/100)</h2>
+    <p class="desc">동·골목 단위가 없어 ‘매일 켜는 운영 콘솔’ 가치는 제한적이지만, 흩어진 데이터를 교차검증·통합해 <b>의회·예산·기관협업을 설득하는 근거</b>로서의 가치가 큽니다. 한계를 먼저 인정하고 그 강점에 집중합니다.</p>
+    <div class="vbar">
+      <div class="row"><div class="lab"><span>현장 운영가치 (매일·동별 의사결정)</span><span>52</span></div><div class="track"><div class="fill" style="width:52%;background:#64748b"></div></div></div>
+      <div class="row"><div class="lab"><span>설득·근거 가치 (사업기획·예산·협업)</span><span>89</span></div><div class="track"><div class="fill" style="width:89%;background:linear-gradient(90deg,#f97316,#fdba74)"></div></div></div>
+    </div>
+  </section>
+
+  <!-- ===== 로드맵 Now→Next→Goal ===== -->
+  <div class="sec-title"><h3>발전 방향 — 66점에서 100점으로</h3><span class="ln"></span></div>
+  <section class="card">
+    <h2>🧭 로드맵 (Now → Next → Goal)</h2>
+    <p class="desc">소관 데이터와 해상도를 높이면 ‘설득 도구’가 <b>현장 입지 도구</b>로 진화합니다.</p>
+    <div class="stages">
+      <div class="stage now"><span class="tag2">NOW · 반영됨</span><h4>강남구 단위 통합</h4><p>5대범죄·검거율 + 가로등·바닥신호등 + <b style="color:#22d3ee">지킴이집 116·택배함 7</b> 중첩 지도 + 교차검증 배지</p></div>
+      <div class="stage next"><span class="tag2">NEXT · 보완</span><h4>동·골목 해상도</h4><p>동별 성범죄 / 범죄주의구간(15101797, 도로 10등급) · 안심길·비상벨·스카우트 6개 동 좌표 · 성범죄 시간대·요일</p></div>
+      <div class="stage goal"><span class="tag2">GOAL · 100점</span><h4>현장 입지 도구</h4><p>“어느 동·골목에 먼저”까지 답 → 안심길·스카우트 <b>동 선정</b>·예산 배분의 직접 근거</p></div>
+    </div>
+  </section>
+
+  <!-- ===== 기대 효과 ===== -->
+  <section class="card">
+    <h2>📈 기대 효과 — 감(感)에서 근거로</h2>
+    <p class="desc">데이터가 예산·사업·협업으로 실제 전환됩니다. (정량 효과는 보완 데이터 확보 후 측정 가능)</p>
+    <div class="ba">
+      <div class="col before"><div class="h">BEFORE</div><ul><li>민원·체감에 의존한 사업 입지</li><li>예산·의회 설득 근거 부족</li><li>기관별 데이터 제각각·반복 검증</li></ul></div>
+      <div class="vs">→</div>
+      <div class="col after"><div class="h">AFTER</div><ul><li>조명 사각 × 성범죄 <b>근거 기반</b> 배치</li><li>교차검증된 <b>한 장 설득 화면</b></li><li>경찰·도로과 <b>협업 공용 보드</b></li></ul></div>
+    </div>
+  </section>
+
+  <!-- ===== 맺음 ===== -->
+  <section class="closing">
+    <div class="q">“불안을 <b>근거</b>로 번역하는 다리.<br/>그 다리가 가장 필요한 사람은 <b>가족정책팀 여성안전 4인</b>이다.”</div>
+    <div class="sub">강남구 생활안전 대시보드 · 다음 단계 = 동별 성범죄·안심 인프라 좌표 연동</div>
   </section>
 
   <!-- ===== 참고: 타 부서 소관 ===== -->
