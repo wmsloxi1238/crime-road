@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 위험 골목길 분석 — 서울 5대범죄 대시보드</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0f172a; --panel:#1e293b; --panel2:#1e293bcc; --line:#334155;
+    --text:#e2e8f0; --muted:#94a3b8; --orange:#f97316; --blue:#3b82f6;
+    --purple:#a855f7; --yellow:#eab308; --red:#ef4444;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.5}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-direction:column;gap:22px}
+  .hero{border:1px solid var(--line);border-radius:24px;padding:32px 28px;
+    background:radial-gradient(120% 140% at 0% 0%, rgba(249,115,22,.22), rgba(30,41,59,.4) 45%, #0f172a 100%)}
+  .tag{display:inline-flex;align-items:center;gap:8px;color:var(--orange);font-size:12px;font-weight:700;letter-spacing:.04em}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);animation:p 1.6s infinite}
+  @keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+  h1{font-size:34px;font-weight:800;color:#fff;margin:14px 0 8px;line-height:1.2}
+  .lead{color:#cbd5e1;max-width:640px;font-size:15px}
+  .lead b{color:#fff}
+  .hl{margin-top:20px;display:inline-flex;align-items:baseline;gap:12px;background:rgba(15,23,42,.6);
+    border:1px solid rgba(249,115,22,.35);border-radius:16px;padding:12px 20px}
+  .hl .big{font-size:30px;font-weight:800;color:var(--orange)}
+  .hl .s{font-size:13px;color:var(--muted)}
+  .filter{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .filter .lbl{font-size:12px;color:var(--muted);margin-right:4px}
+  .chip{padding:7px 14px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;
+    background:var(--panel);color:#cbd5e1;border:1px solid var(--line);transition:.15s}
+  .chip:hover{border-color:#64748b}
+  .chip.active{background:#fff;color:#0f172a;border-color:#fff}
+  .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(min-width:820px){.kpis{grid-template-columns:repeat(4,1fr)}}
+  .kpi{background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:4px}
+  .kpi .l{font-size:12px;color:var(--muted);font-weight:500}
+  .kpi .v{font-size:28px;font-weight:800;color:#fff}
+  .kpi .v.o{color:var(--orange)} .kpi .v.r{color:#fb7185}
+  .kpi .sub{font-size:12px;color:var(--muted)}
+  .card{background:rgba(30,41,59,.4);border:1px solid var(--line);border-radius:18px;padding:20px}
+  .card h2{font-size:17px;color:#fff;margin-bottom:4px}
+  .card .desc{font-size:13px;color:var(--muted);margin-bottom:16px}
+  .grid2{display:grid;grid-template-columns:1fr;gap:22px}
+  @media(min-width:820px){.grid2{grid-template-columns:1fr 1fr}}
+  .chartbox{position:relative;width:100%}
+  table.heat{width:100%;border-collapse:collapse;font-size:12px}
+  table.heat th{padding:8px;color:var(--muted);font-weight:500;white-space:nowrap}
+  table.heat th.left,table.heat td.left{text-align:left}
+  table.heat td{padding:4px;text-align:center}
+  table.heat tr+tr{border-top:1px solid #33415580}
+  .cell{border-radius:6px;padding:6px 4px;font-weight:600}
+  .scroll{overflow-x:auto}
+  footer{font-size:12px;color:#64748b;line-height:1.7;padding-bottom:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="tag"><span class="dot"></span> AI 위험 골목길 분석 서비스</div>
+    <h1>서울, 어디가 위험한가?</h1>
+    <p class="lead">2024년 서울시 5대범죄 <b id="leadTotal"></b>을 장소별로 분석했습니다. 절반에 가까운 범죄가 거리와 골목에서 일어났습니다.</p>
+    <div class="hl">
+      <span class="s">보도·골목길에서만</span>
+      <span class="big" id="alleyBig"></span>
+      <span class="s" id="alleyPct"></span>
+    </div>
+  </header>
+
+  <div class="filter" id="filter"><span class="lbl">범죄 유형 필터</span></div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section class="card">
+    <h2>🚸 노상 · 골목길 집중 분석</h2>
+    <p class="desc">거리 유형별 발생 구성. 보도·골목길은 절도·폭력이 압도적이며, 차도로 갈수록 폭력 비중이 높아집니다.</p>
+    <div class="chartbox" style="height:260px"><canvas id="streetChart"></canvas></div>
+  </section>
+
+  <div class="grid2">
+    <section class="card">
+      <h2>🏆 위험 장소 Top 12</h2>
+      <p class="desc" id="rankDesc"></p>
+      <div class="chartbox" style="height:420px"><canvas id="rankChart"></canvas></div>
+    </section>
+    <section class="card">
+      <h2>🍩 범죄 유형 구성비</h2>
+      <p class="desc">서울 5대범죄 전체에서 차지하는 비율</p>
+      <div class="chartbox" style="height:420px"><canvas id="pieChart"></canvas></div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>🏙️ 장소 유형별 × 범죄 구성</h2>
+    <p class="desc">장소를 그룹으로 묶어 비교. 상점은 절도, 주거·노상·유흥은 폭력이 두드러집니다.</p>
+    <div class="chartbox" style="height:340px"><canvas id="groupChart"></canvas></div>
+  </section>
+
+  <section class="card">
+    <h2>🔥 장소 × 범죄 히트맵</h2>
+    <p class="desc">발생 상위 14개 장소. 색이 진할수록 해당 장소·범죄 조합의 발생이 많습니다.</p>
+    <div class="scroll"><table class="heat" id="heat"></table></div>
+  </section>
+
+  <footer>
+    데이터 출처: 공공데이터포털 · 경찰청 서울특별시경찰청 「5대범죄 발생 장소별 현황」(2024) · data.go.kr/data/15054737 · 공간범위: 서울특별시 · 단위: 건<br/>
+    ※ 본 데이터에는 자치구·위경도 정보가 없어 지도 매핑은 제외되었습니다. 구 단위 지도는 ‘경찰서별 5대범죄 발생·검거 현황’(15054738) 추가 시 확장 가능합니다.
+  </footer>
+</div>
+
+<script>
+const CRIMES=["폭력","절도","강간·강제추행","강도","살인"];
+const COLOR={"폭력":"#f97316","절도":"#3b82f6","강간·강제추행":"#a855f7","강도":"#eab308","살인":"#ef4444"};
+const MATRIX={
+"단독주택":{"강간·강제추행":154,"강도":1,"살인":12,"절도":734,"폭력":1588},
+"아파트":{"강간·강제추행":226,"강도":6,"살인":21,"절도":1937,"폭력":4367},
+"다세대/연립":{"강간·강제추행":362,"강도":3,"살인":35,"절도":1778,"폭력":3458},
+"오피스텔(원룸)":{"강간·강제추행":267,"강도":3,"살인":7,"절도":450,"폭력":922},
+"기타거주시설(기숙사 등)":{"강간·강제추행":41,"강도":0,"살인":4,"절도":190,"폭력":416},
+"고속도로":{"강간·강제추행":3,"강도":0,"살인":0,"절도":4,"폭력":29},
+"자동차전용도로":{"강간·강제추행":1,"강도":0,"살인":0,"절도":4,"폭력":141},
+"일반도로":{"강간·강제추행":69,"강도":3,"살인":7,"절도":822,"폭력":2946},
+"통행로(보도/골목길)":{"강간·강제추행":368,"강도":10,"살인":9,"절도":4816,"폭력":6517},
+"백화점":{"강간·강제추행":14,"강도":0,"살인":0,"절도":1120,"폭력":71},
+"대형할인점":{"강간·강제추행":12,"강도":1,"살인":0,"절도":1580,"폭력":91},
+"슈퍼마켓, 소매점":{"강간·강제추행":12,"강도":0,"살인":2,"절도":1346,"폭력":97},
+"편의점":{"강간·강제추행":48,"강도":9,"살인":0,"절도":1498,"폭력":347},
+"시장/노점":{"강간·강제추행":20,"강도":0,"살인":1,"절도":500,"폭력":293},
+"창고(매장창고한정)":{"강간·강제추행":3,"강도":0,"살인":0,"절도":74,"폭력":29},
+"무인상점":{"강간·강제추행":3,"강도":0,"살인":0,"절도":2406,"폭력":98},
+"기타상점":{"강간·강제추행":104,"강도":4,"살인":1,"절도":3339,"폭력":817},
+"숙박업소(호텔/모텔/여관)":{"강간·강제추행":544,"강도":3,"살인":3,"절도":199,"폭력":417},
+"목욕탕/찜질방/사우나":{"강간·강제추행":109,"강도":0,"살인":0,"절도":347,"폭력":61},
+"이발소/미용실":{"강간·강제추행":10,"강도":0,"살인":0,"절도":45,"폭력":37},
+"마사지업소":{"강간·강제추행":31,"강도":0,"살인":0,"절도":22,"폭력":40},
+"공중위생업소/기타":{"강간·강제추행":14,"강도":0,"살인":0,"절도":24,"폭력":43},
+"음식점":{"강간·강제추행":232,"강도":1,"살인":4,"절도":925,"폭력":1438},
+"카페":{"강간·강제추행":57,"강도":0,"살인":0,"절도":387,"폭력":182},
+"주점":{"강간·강제추행":381,"강도":1,"살인":3,"절도":604,"폭력":1640},
+"단란/유흥/나이트(클럽)/ 카바레":{"강간·강제추행":454,"강도":2,"살인":1,"절도":255,"폭력":1163},
+"버스터미널/정류소":{"강간·강제추행":20,"강도":0,"살인":0,"절도":72,"폭력":76},
+"지하철역/전철역":{"강간·강제추행":202,"강도":0,"살인":0,"절도":406,"폭력":579},
+"버스":{"강간·강제추행":125,"강도":0,"살인":0,"절도":77,"폭력":181},
+"택시":{"강간·강제추행":54,"강도":1,"살인":0,"절도":210,"폭력":535},
+"자가용자동차":{"강간·강제추행":81,"강도":5,"살인":2,"절도":246,"폭력":132},
+"지하철/전철":{"강간·강제추행":441,"강도":0,"살인":0,"절도":201,"폭력":338},
+"공연장/극장":{"강간·강제추행":11,"강도":0,"살인":0,"절도":49,"폭력":25},
+"체육시설":{"강간·강제추행":43,"강도":0,"살인":0,"절도":386,"폭력":200},
+"공원/놀이시설":{"강간·강제추행":37,"강도":2,"살인":1,"절도":293,"폭력":309},
+"게임장/pc방":{"강간·강제추행":13,"강도":0,"살인":1,"절도":366,"폭력":141},
+"기타(DVD방, 유원지)":{"강간·강제추행":35,"강도":1,"살인":1,"절도":92,"폭력":114},
+"학교":{"강간·강제추행":79,"강도":0,"살인":0,"절도":291,"폭력":282},
+"금융보험기관":{"강간·강제추행":4,"강도":2,"살인":0,"절도":428,"폭력":50},
+"의료기관":{"강간·강제추행":75,"강도":1,"살인":5,"절도":259,"폭력":311},
+"종교시설":{"강간·강제추행":15,"강도":0,"살인":0,"절도":77,"폭력":157},
+"관공서":{"강간·강제추행":15,"강도":0,"살인":1,"절도":81,"폭력":157},
+"기차역":{"강간·강제추행":3,"강도":0,"살인":0,"절도":7,"폭력":17},
+"여객선터미널":{"강간·강제추행":0,"강도":0,"살인":0,"절도":1,"폭력":0},
+"공항":{"강간·강제추행":1,"강도":0,"살인":0,"절도":14,"폭력":11},
+"기차":{"강간·강제추행":0,"강도":0,"살인":0,"절도":2,"폭력":4},
+"선박":{"강간·강제추행":0,"강도":0,"살인":0,"절도":0,"폭력":0},
+"비행기":{"강간·강제추행":2,"강도":0,"살인":0,"절도":2,"폭력":1},
+"교통수단내/기타":{"강간·강제추행":3,"강도":0,"살인":0,"절도":34,"폭력":32},
+"어린이집/유치원":{"강간·강제추행":1,"강도":0,"살인":0,"절도":10,"폭력":12},
+"도서관":{"강간·강제추행":4,"강도":0,"살인":0,"절도":51,"폭력":19},
+"학원":{"강간·강제추행":30,"강도":0,"살인":0,"절도":21,"폭력":23},
+"기타 교육시설":{"강간·강제추행":13,"강도":0,"살인":0,"절도":31,"폭력":34},
+"야외/산야":{"강간·강제추행":36,"강도":0,"살인":2,"절도":529,"폭력":424},
+"해안":{"강간·강제추행":0,"강도":0,"살인":0,"절도":0,"폭력":1},
+"폐가/공터":{"강간·강제추행":1,"강도":1,"살인":0,"절도":35,"폭력":39},
+"공중화장실":{"강간·강제추행":14,"강도":0,"살인":0,"절도":86,"폭력":52},
+"군사기지/군사시설":{"강간·강제추행":0,"강도":0,"살인":0,"절도":0,"폭력":7},
+"구금장소":{"강간·강제추행":10,"강도":0,"살인":0,"절도":2,"폭력":44},
+"사회복지시설":{"강간·강제추행":9,"강도":0,"살인":0,"절도":20,"폭력":52},
+"미상":{"강간·강제추행":14,"강도":0,"살인":2,"절도":144,"폭력":377},
+"기타":{"강간·강제추행":593,"강도":27,"살인":24,"절도":5577,"폭력":7570}
+};
+const GROUP_OF={
+"단독주택":"주거","아파트":"주거","다세대/연립":"주거","오피스텔(원룸)":"주거","기타거주시설(기숙사 등)":"주거",
+"고속도로":"노상/길거리","자동차전용도로":"노상/길거리","일반도로":"노상/길거리","통행로(보도/골목길)":"노상/길거리",
+"백화점":"상점/유통","대형할인점":"상점/유통","슈퍼마켓, 소매점":"상점/유통","편의점":"상점/유통","시장/노점":"상점/유통","창고(매장창고한정)":"상점/유통","무인상점":"상점/유통","기타상점":"상점/유통",
+"숙박업소(호텔/모텔/여관)":"숙박/위생","목욕탕/찜질방/사우나":"숙박/위생","이발소/미용실":"숙박/위생","마사지업소":"숙박/위생","공중위생업소/기타":"숙박/위생",
+"음식점":"유흥/음식","카페":"유흥/음식","주점":"유흥/음식","단란/유흥/나이트(클럽)/ 카바레":"유흥/음식",
+"버스터미널/정류소":"교통","지하철역/전철역":"교통","버스":"교통","택시":"교통","자가용자동차":"교통","지하철/전철":"교통",
+"기차역":"교통","여객선터미널":"교통","공항":"교통","기차":"교통","선박":"교통","비행기":"교통","교통수단내/기타":"교통",
+"공연장/극장":"여가/오락","체육시설":"여가/오락","공원/놀이시설":"여가/오락","게임장/pc방":"여가/오락","기타(DVD방, 유원지)":"여가/오락",
+"학교":"교육","어린이집/유치원":"교육","도서관":"교육","학원":"교육","기타 교육시설":"교육",
+"금융보험기관":"업무/공공","의료기관":"업무/공공","종교시설":"업무/공공","관공서":"업무/공공",
+"야외/산야":"기타","공중화장실":"기타","해안":"기타","폐가/공터":"기타","군사기지/군사시설":"기타","구금장소":"기타","사회복지시설":"기타","미상":"기타","기타":"기타"
+};
+const STREET=["통행로(보도/골목길)","일반도로","자동차전용도로","고속도로"];
+
+const fmt=n=>n.toLocaleString("ko-KR");
+const PLACES=Object.keys(MATRIX);
+const rowTotal=p=>CRIMES.reduce((s,c)=>s+(MATRIX[p][c]||0),0);
+const GRAND=PLACES.reduce((s,p)=>s+rowTotal(p),0);
+const CRIME_TOTAL={};CRIMES.forEach(c=>CRIME_TOTAL[c]=PLACES.reduce((s,p)=>s+(MATRIX[p][c]||0),0));
+const STREET_TOTAL=STREET.reduce((s,p)=>s+rowTotal(p),0);
+const ALLEY=rowTotal("통행로(보도/골목길)");
+const gridColor="#334155", tickColor="#94a3b8";
+Chart.defaults.color="#cbd5e1";Chart.defaults.font.size=11;
+
+let state="전체";
+
+// hero + kpi static
+document.getElementById("leadTotal").textContent=fmt(GRAND)+"건";
+document.getElementById("alleyBig").textContent=fmt(ALLEY)+"건";
+document.getElementById("alleyPct").textContent="전체의 "+(ALLEY/GRAND*100).toFixed(1)+"%";
+document.getElementById("kpis").innerHTML=`
+  <div class="kpi"><span class="l">총 발생건수 (5대범죄)</span><span class="v">${fmt(GRAND)}</span><span class="sub">서울 · 2024년</span></div>
+  <div class="kpi"><span class="l">노상/길거리 발생</span><span class="v o">${fmt(STREET_TOTAL)}</span><span class="sub">전체의 ${(STREET_TOTAL/GRAND*100).toFixed(1)}%</span></div>
+  <div class="kpi"><span class="l">최다 범죄 유형</span><span class="v o">폭력</span><span class="sub">${fmt(CRIME_TOTAL["폭력"])}건 · ${(CRIME_TOTAL["폭력"]/GRAND*100).toFixed(0)}%</span></div>
+  <div class="kpi"><span class="l">최다 발생 장소</span><span class="v r">골목길</span><span class="sub">통행로 ${fmt(ALLEY)}건 (1위)</span></div>`;
+
+// filter chips
+const fil=document.getElementById("filter");
+["전체",...CRIMES].forEach(c=>{
+  const b=document.createElement("div");b.className="chip"+(c==="전체"?" active":"");b.textContent=c;
+  b.onclick=()=>{state=c;document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x.textContent===c));updateDynamic();};
+  fil.appendChild(b);
+});
+
+const baseScale={x:{grid:{color:gridColor},ticks:{color:tickColor}},y:{grid:{color:gridColor},ticks:{color:"#cbd5e1"}}};
+
+// street stacked (horizontal)
+new Chart(document.getElementById("streetChart"),{
+  type:"bar",
+  data:{labels:STREET.map(p=>p.replace("(보도/골목길)","")),
+    datasets:CRIMES.map(c=>({label:c,data:STREET.map(p=>MATRIX[p][c]||0),backgroundColor:COLOR[c]}))},
+  options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
+    scales:{x:{stacked:true,...baseScale.x},y:{stacked:true,...baseScale.y}},
+    plugins:{legend:{labels:{boxWidth:12}}}}
+});
+
+// group stacked (vertical)
+const groups={};
+PLACES.forEach(p=>{const g=GROUP_OF[p];if(g==="기타")return;groups[g]=groups[g]||{};CRIMES.forEach(c=>groups[g][c]=(groups[g][c]||0)+(MATRIX[p][c]||0));});
+const gNames=Object.keys(groups).sort((a,b)=>CRIMES.reduce((s,c)=>s+groups[b][c],0)-CRIMES.reduce((s,c)=>s+groups[a][c],0));
+new Chart(document.getElementById("groupChart"),{
+  type:"bar",
+  data:{labels:gNames,datasets:CRIMES.map(c=>({label:c,data:gNames.map(g=>groups[g][c]),backgroundColor:COLOR[c]}))},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{x:{stacked:true,...baseScale.x},y:{stacked:true,...baseScale.y}},
+    plugins:{legend:{labels:{boxWidth:12}}}}
+});
+
+// pie
+new Chart(document.getElementById("pieChart"),{
+  type:"doughnut",
+  data:{labels:CRIMES,datasets:[{data:CRIMES.map(c=>CRIME_TOTAL[c]),backgroundColor:CRIMES.map(c=>COLOR[c]),borderColor:"#0f172a",borderWidth:2}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:"58%",plugins:{legend:{position:"bottom",labels:{boxWidth:12}}}}
+});
+
+// ranking (dynamic)
+let rankChart=new Chart(document.getElementById("rankChart"),{
+  type:"bar",data:{labels:[],datasets:[{data:[],backgroundColor:[]}]},
+  options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
+    scales:{x:baseScale.x,y:{grid:{display:false},ticks:{color:"#cbd5e1"}}},
+    plugins:{legend:{display:false}}}
+});
+
+// heatmap (static, top14 by total)
+(function(){
+  const top=PLACES.filter(p=>p!=="기타").map(p=>({p,v:rowTotal(p)})).sort((a,b)=>b.v-a.v).slice(0,14).map(x=>x.p);
+  const max=Math.max(...top.flatMap(p=>CRIMES.map(c=>MATRIX[p][c]||0)));
+  let h="<thead><tr><th class='left'>장소</th>"+CRIMES.map(c=>`<th>${c}</th>`).join("")+"</tr></thead><tbody>";
+  top.forEach(p=>{
+    h+=`<tr><td class='left'>${p}</td>`;
+    CRIMES.forEach(c=>{const v=MATRIX[p][c]||0;const t=Math.pow(v/max,0.45);
+      h+=`<td><div class='cell' style="background:rgba(249,115,22,${(0.08+t*0.85).toFixed(3)});color:${t>0.5?"#0f172a":"#e2e8f0"}">${v?fmt(v):"·"}</div></td>`;});
+    h+="</tr>";
+  });
+  document.getElementById("heat").innerHTML=h+"</tbody>";
+})();
+
+function updateDynamic(){
+  document.getElementById("rankDesc").textContent=(state==="전체"?"전체 5대범죄":state)+" 기준 발생건수 (‘기타’ 제외)";
+  const val=p=>state==="전체"?rowTotal(p):(MATRIX[p][state]||0);
+  const rows=PLACES.filter(p=>p!=="기타").map(p=>({p,v:val(p)})).sort((a,b)=>b.v-a.v).slice(0,12);
+  rankChart.data.labels=rows.map(r=>r.p);
+  rankChart.data.datasets[0].data=rows.map(r=>r.v);
+  rankChart.data.datasets[0].backgroundColor=rows.map(r=>r.p.includes("골목")?"#f97316":"#475569");
+  rankChart.update();
+}
+updateDynamic();
+</script>
+</body>
+</html>
