@@ -345,21 +345,13 @@
     <p class="sowhat" id="mapSo"></p>
   </section>
 
-  <!-- ===== 참고: 서울/전국 장소 패턴 ===== -->
-  <div class="sec-title"><h3>참고 · 서울/전국 장소별 범죄 패턴 (강남 단위 미공개)</h3><span class="ln"></span></div>
-
-  <div class="grid2">
-    <section class="card">
-      <h2>🏙️ 서울 5대범죄 — 장소별 Top 12 <span class="badge">서울 전체</span></h2>
-      <p class="desc">강남구 장소 데이터가 없어 <b>서울 전체</b> 기준 참고용. 보도·골목길이 단일 장소 1위입니다. (15054737)</p>
-      <div class="chartbox" style="height:360px"><canvas id="seoulPlaceChart"></canvas></div>
-    </section>
-    <section class="card">
-      <h2>🇰🇷 전국 범죄 — 장소별 Top 12 <span class="badge">전국</span></h2>
-      <p class="desc">전 범죄 유형 기준 <b>전국</b> 발생 장소. 일반도로·아파트·골목길 순. 강남과 직접 연결되진 않는 거시 패턴입니다. (3074463)</p>
-      <div class="chartbox" style="height:360px"><canvas id="nationPlaceChart"></canvas></div>
-    </section>
-  </div>
+  <!-- ===== 동별 안전시설물 충분도 ===== -->
+  <section class="card">
+    <h2>🏘️ 동별 안심 안전시설물 충분도 — 보안등·CCTV·112신고·안심벨</h2>
+    <p class="desc">강남구 안전시설물 <b>848개</b>(OA21696)의 행정동 분포. 막대가 짧은 동이 시설이 상대적으로 적은 곳입니다. <b>※ 면적·유동인구 보정 전 절대량</b>이므로 ‘점검 후보 선별’ 용도로 보세요.</p>
+    <div class="chartbox" style="height:340px"><canvas id="dongFacChart"></canvas></div>
+    <p class="sowhat" id="dongFacSo"></p>
+  </section>
 
   <section class="note">
     <b>데이터 범위</b> — 강남구 범죄는 <b>구 전체·죄종별</b>까지만 공개되고 동·골목 단위는 비공개입니다(개인정보 보호). 지도의 ‘최우선 후보 셀’은 가로등·안심 인프라 좌표로 추정한 것이며, <b>동별 성범죄·범죄주의구간(15101797, 도로 10등급)</b>을 확보하면 동·골목 정밀도로 확장됩니다. ‘참고’ 섹션의 장소별 패턴은 강남 분리가 불가능한 서울/전국 집계입니다.
@@ -508,29 +500,22 @@ new Chart(document.getElementById("gubunChart"),{
       tooltip:{callbacks:{label:c=>` ${c.label}: ${fmt(c.parsed)}건`}}}}
 });
 
-// ---- [참고] 서울 장소별 (15054737) stacked Top12 ----
-const SHORT=p=>p.replace("(보도/골목길)","").replace("(원룸)","").replace("(기숙사 등)","").replace(", 소매점","").replace(/\(.*?\)/g,"");
-new Chart(document.getElementById("seoulPlaceChart"),{
-  type:"bar",
-  data:{labels:D.seoulPlace.map((x,i)=>`${i+1}. ${SHORT(x.장소)}`),
-    datasets:CRIMES.map(c=>({label:c,data:D.seoulPlace.map(x=>x[c]||0),backgroundColor:COLOR[c]}))},
-  options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
-    scales:{x:{stacked:true,...baseScale.x},y:{stacked:true,grid:{display:false},ticks:{color:"#cbd5e1"}}},
-    plugins:{legend:{labels:{boxWidth:12}},
-      tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmt(c.parsed.x)}건`}}}}
-});
-
-// ---- [참고] 전국 장소별 (3074463) Top12 ----
-const natColor=D.nationPlace.map(d=>d[0].includes("골목")?"#f97316":d[0].includes("도로")?"#60a5fa":"#475569");
-new Chart(document.getElementById("nationPlaceChart"),{
-  type:"bar",
-  data:{labels:D.nationPlace.map((d,i)=>`${i+1}. ${SHORT(d[0])}`),
-    datasets:[{data:D.nationPlace.map(d=>d[1]),backgroundColor:natColor,borderRadius:4,maxBarThickness:24}]},
-  options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,layout:{padding:{right:52}},
-    scales:{x:{...baseScale.x,grace:"8%"},y:{grid:{display:false},ticks:{color:"#cbd5e1"}}},
-    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${fmt(c.parsed.x)}건`}}},
-  plugins:[valueLabel]}
-});
+// ---- 동별 안전시설물 충분도 (OA21696) ----
+(function(){
+  const df=D.dongFacility; if(!df||!df.length)return;
+  const TYPES=[["보안등","#eab308"],["CCTV","#3b82f6"],["112위치신고","#22c55e"],["안심벨","#ef4444"],["노면표기","#a855f7"],["안내표지판","#64748b"]];
+  const rows=[...df].sort((a,b)=>b.합계-a.합계);
+  new Chart(document.getElementById("dongFacChart"),{
+    type:"bar",
+    data:{labels:rows.map(d=>`${d.동} (${d.합계})`),
+      datasets:TYPES.map(([t,c])=>({label:t.replace("112위치신고","112신고"),data:rows.map(d=>d[t]||0),backgroundColor:c}))},
+    options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
+      scales:{x:{stacked:true,...baseScale.x},y:{stacked:true,grid:{display:false},ticks:{color:"#cbd5e1"}}},
+      plugins:{legend:{labels:{boxWidth:12}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.x}개`}}}}
+  });
+  const low=[...df].sort((a,b)=>a.합계-b.합계).slice(0,3);
+  document.getElementById("dongFacSo").innerHTML=`시설물이 가장 적은 동: <b>${low.map(d=>d.동+" "+d.합계+"개").join(" · ")}</b> → 보안등·안심벨 확충 검토 후보(면적·범죄 대비 점검 필요). 보안등이 전체의 ${(df.reduce((s,d)=>s+d.보안등,0)/df.reduce((s,d)=>s+d.합계,0)*100).toFixed(0)}%로 핵심 조명 인프라입니다.`;
+})();
 
 // ---- 서울 속 강남 벤치마크 ----
 (function(){
@@ -575,9 +560,10 @@ new Chart(document.getElementById("nationPlaceChart"),{
 
 // ---- 여성안심 지도 (Leaflet + 격자 사각 탐지 + 레이어 토글) ----
 (function(){
-  const pts=D.lamps,cross=D.cross||[],guard=D.guardian||[],deliv=D.delivery||[],bells=D.safebell||[],routes=D.saferoute||[];
+  const lamps=D.lamps,sec=D.secLights||[],cross=D.cross||[],guard=D.guardian||[],deliv=D.delivery||[],bells=D.safebell||[],routes=D.saferoute||[],cctv=D.cctv||[],rep=D.report112||[];
+  const pts=lamps.concat(sec);  // 조명 = 가로등 + 보안등(OA21696)
   const $=id=>document.getElementById(id);
-  $("lampN").textContent=`${fmt(pts.length)}개`; $("crossN").textContent=`${fmt(cross.length)}개`;
+  $("lampN").textContent=`${fmt(lamps.length)}개`; $("crossN").textContent=`${fmt(cross.length)}개`;
   $("guardN").textContent=`${fmt(guard.length)}개`; $("delivN").textContent=`${fmt(deliv.length)}개`;
   $("bellN").textContent=`${fmt(bells.length)}개`; $("routeN").textContent=`${fmt(routes.length)}개 노선`;
 
@@ -596,7 +582,7 @@ new Chart(document.getElementById("nationPlaceChart"),{
     if(lamp>0&&lamp<lowT)cells.push({r:Math.floor(i/COLS),c:i%COLS,lamp,infra:infraC[i],gap:infraC[i]===0});}
   const gapCells=cells.filter(x=>x.gap);
   $("gapN").textContent=`${gapCells.length}곳`;
-  $("lampDesc").innerHTML=`가로등 <b>${fmt(pts.length)}</b>·바닥신호등 <b>${fmt(cross.length)}</b> 위에 안심귀갓길 <b>${fmt(routes.length)}노선</b>·안심벨 <b>${fmt(bells.length)}</b>·지킴이집 <b>${fmt(guard.length)}</b>·택배함 <b>${fmt(deliv.length)}</b>를 겹치고, 격자로 <b style="color:#fb7185">조명 사각 + 인프라 공백 셀</b>을 자동 탐지했습니다. 아래 토글로 레이어를 켜고 끄세요.`;
+  $("lampDesc").innerHTML=`조명(가로등 <b>${fmt(lamps.length)}</b> + 보안등 <b>${fmt(sec.length)}</b>) 위에 안심귀갓길 <b>${fmt(routes.length)}노선</b>·안심벨 <b>${fmt(bells.length)}</b>·CCTV <b>${fmt(cctv.length)}</b>·112신고 <b>${fmt(rep.length)}</b>·지킴이집 <b>${fmt(guard.length)}</b>·택배함 <b>${fmt(deliv.length)}</b>를 겹치고, 격자로 <b style="color:#fb7185">조명 사각 + 안심 인프라 공백 셀</b>을 자동 탐지했습니다. 아래 토글로 레이어를 켜고 끄세요.`;
   $("mapSo").innerHTML=`격자 분석: <b>조명 사각 후보 ${cells.length}곳</b> 중 <b style="color:#fb7185">안심 인프라가 0인 ‘최우선 후보’ ${gapCells.length}곳</b>. 여기에 안심벨·지킴이집·안심길을 먼저 깔면 비용 대비 야간 안전 효과가 큽니다. (격자 ${ROWS}×${COLS} · 가로등 밀도 평균 40% 미만 셀)`;
 
   if(typeof L==="undefined"){$("lampDesc").innerHTML="(지도 라이브러리 로드 실패 — 인터넷 연결 필요)";return;}
@@ -608,11 +594,14 @@ new Chart(document.getElementById("nationPlaceChart"),{
   const Ldeliv=L.layerGroup(deliv.map(p=>L.circleMarker([p[0],p[1]],{radius:7,color:"#9d174d",weight:1.5,fillColor:"#f472b6",fillOpacity:.95}).bindTooltip(`📦 안심택배함<br>${p[2]||""}`,{direction:"top"})));
   const Lbell=L.layerGroup(bells.map(p=>L.circleMarker([p[0],p[1]],{radius:5,color:"#7f1d1d",weight:1.5,fillColor:"#ef4444",fillOpacity:.95}).bindTooltip("🔔 안심벨",{direction:"top"})));
   const Lroute=L.layerGroup(routes.map(line=>L.polyline(line,{color:"#fb923c",weight:3,opacity:.75}).bindTooltip("🛡️ 안심귀갓길",{sticky:true})));
+  const Lsec=L.layerGroup(sec.map(p=>L.circleMarker([p[0],p[1]],{radius:3,color:"#a16207",weight:1,fillColor:"#fde047",fillOpacity:.85}).bindTooltip("💡 보안등",{direction:"top"})));
+  const Lcctv=L.layerGroup(cctv.map(p=>L.circleMarker([p[0],p[1]],{radius:4,color:"#1e40af",weight:1,fillColor:"#60a5fa",fillOpacity:.95}).bindTooltip("📹 CCTV",{direction:"top"})));
+  const L112=L.layerGroup(rep.map(p=>L.circleMarker([p[0],p[1]],{radius:4,color:"#166534",weight:1,fillColor:"#4ade80",fillOpacity:.95}).bindTooltip("🆘 112 위치신고",{direction:"top"})));
   const Lgap=L.layerGroup(cells.map(x=>{const la1=b.minLa+x.r*cLa,lo1=b.minLo+x.c*cLo;
     return L.rectangle([[la1,lo1],[la1+cLa,lo1+cLo]],{color:x.gap?"#ef4444":"#f59e0b",weight:1,fillColor:x.gap?"#ef4444":"#f59e0b",fillOpacity:x.gap?.32:.15})
       .bindTooltip(x.gap?"⚠️ 최우선 후보 (조명 사각 + 안심 인프라 0)":"조명 사각 (인프라 일부 있음)",{sticky:true});}));
-  const layers={"가로등 밀도":Lheat,"바닥신호등":Lcross,"지킴이집":Lguard,"안심택배함":Ldeliv,"안심벨":Lbell,"안심귀갓길":Lroute,"사각·공백 셀":Lgap};
-  const colorOf={"가로등 밀도":"#fde68a","바닥신호등":"#34d399","지킴이집":"#22d3ee","안심택배함":"#f472b6","안심벨":"#ef4444","안심귀갓길":"#fb923c","사각·공백 셀":"#ef4444"};
+  const layers={"조명 밀도(가로등+보안등)":Lheat,"보안등":Lsec,"CCTV":Lcctv,"112신고":L112,"안심벨":Lbell,"안심귀갓길":Lroute,"지킴이집":Lguard,"안심택배함":Ldeliv,"바닥신호등":Lcross,"사각·공백 셀":Lgap};
+  const colorOf={"조명 밀도(가로등+보안등)":"#fde68a","보안등":"#fde047","CCTV":"#60a5fa","112신고":"#4ade80","안심벨":"#ef4444","안심귀갓길":"#fb923c","지킴이집":"#22d3ee","안심택배함":"#f472b6","바닥신호등":"#34d399","사각·공백 셀":"#ef4444"};
   [Lheat,Lguard,Lbell,Lroute,Lgap].forEach(l=>l.addTo(map));
   const tg=$("mapToggle");
   Object.keys(layers).forEach(name=>{
