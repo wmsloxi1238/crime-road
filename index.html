@@ -173,14 +173,16 @@
   </section>
 
   <section class="card">
-    <h2>💡 여성안심길·안심계단 후보 지도 (가로등·바닥신호등)</h2>
+    <h2>💡 여성안심길 후보 지도 — 조명 사각 × 안심 인프라 공백 (가로등·바닥신호등·지킴이집·택배함)</h2>
     <p class="desc" id="lampDesc"></p>
     <div class="mapwrap">
       <div id="lampMap"></div>
       <div class="maplegend">
         <span class="swatch" style="background:#fde68a"></span>가로등 <span id="lampN" style="color:#94a3b8"></span><br/>
         <span class="swatch" style="background:#34d399"></span>바닥신호등 <span id="crossN" style="color:#94a3b8"></span><br/>
-        <span style="color:#94a3b8">밝을수록 가로등 밀집 · 어두운 영역 = 조명 사각</span>
+        <span class="swatch" style="background:#22d3ee"></span>여성안심지킴이집 <span id="guardN" style="color:#94a3b8"></span><br/>
+        <span class="swatch" style="background:#f472b6"></span>안심택배함 <span id="delivN" style="color:#94a3b8"></span><br/>
+        <span style="color:#94a3b8">어두운 영역 = 조명 사각 · 인프라 마커 없는 곳 = 안심 공백</span>
       </div>
     </div>
   </section>
@@ -213,7 +215,7 @@
     <p class="desc">아래를 얹으면 ‘설득 도구’를 넘어 <b>동·골목 단위 현장 입지 도구</b>가 됩니다.</p>
     <ul class="road">
       <li><span class="n">1</span><span><b>동별 성범죄 / 범죄주의구간(15101797 WMS, 도로 10등급)</b> — 구→동·골목 해상도 ↑ → 안심길·스카우트 <b>동 선정</b> 가능</span></li>
-      <li><span class="n">2</span><span><b>여성안심 인프라 좌표</b>(안심길·비상벨·택배함·지킴이집·스카우트 6개 동) — 가족정책과 직접 소관 → 공백·성과 점검</span></li>
+      <li><span class="n" style="background:#22c55e">✓</span><span><b>여성안심 인프라 좌표</b> — <b style="color:#22d3ee">지킴이집 116개·택배함 7개 반영 완료</b>(위 지도). 남은 것: 안심길·비상벨·스카우트 6개 동 → 가족정책과 직접 소관 공백·성과 점검</span></li>
       <li><span class="n">3</span><span><b>성범죄 시간대·요일</b> — 스카우트 운영시간·교육 시점 결정</span></li>
     </ul>
   </section>
@@ -291,7 +293,7 @@ set("m_theft",fmt(THEFT.발생)+"건");set("m_theftrate",THEFT.검거율+"%");
 set("m_sex3",fmt(SEX.발생)+"건");
 set("m_sexA",fmt(SEX.발생)+"건");set("m_lampA",fmt(LAMP)+"개");set("m_theftrateA",THEFT.검거율+"%");
 document.getElementById("foot").innerHTML=
-  `데이터 출처: 공공데이터포털/서울열린데이터 · ${D.src.crime}(5대범죄) · ${D.src.parking}(주정차) · ${D.src.lamp}(가로등) · ${D.src.cross}(바닥신호등) · 참고: ${D.src.seoul}(서울 장소별)·${D.src.nation}(전국 장소별) · 공간범위: 서울 강남구(참고 데이터는 서울/전국) · 기간: 2024년<br/>※ 5대범죄 강남구 수치는 강남구 치안통계표와 강남·수서경찰서 관할 합계가 일치함을 교차검증했습니다.`;
+  `데이터 출처: 공공데이터포털/서울열린데이터 · ${D.src.crime}(5대범죄) · ${D.src.parking}(주정차) · ${D.src.lamp}(가로등) · ${D.src.cross}(바닥신호등) · ${D.src.guardian}(지킴이집) · ${D.src.delivery}(택배함) · 참고: ${D.src.seoul}(서울 장소별)·${D.src.nation}(전국 장소별) · 공간범위: 서울 강남구(참고 데이터는 서울/전국) · 기간: 2024년<br/>※ 5대범죄 강남구 수치는 강남구 치안통계표와 강남·수서경찰서 관할 합계가 일치함을 교차검증했습니다.`;
 
 // ---- 죄종별 발생 vs 검거 ----
 new Chart(document.getElementById("crimeChart"),{
@@ -387,10 +389,12 @@ new Chart(document.getElementById("nationPlaceChart"),{
 
 // ---- 가로등 밀도 지도 (Leaflet + heat) ----
 (function(){
-  const pts=D.lamps,cross=D.cross||[];
+  const pts=D.lamps,cross=D.cross||[],guard=D.guardian||[],deliv=D.delivery||[];
   document.getElementById("lampN").textContent=`${fmt(pts.length)}개`;
   document.getElementById("crossN").textContent=`${fmt(cross.length)}개`;
-  document.getElementById("lampDesc").innerHTML=`강남구 일대 가로등 <b>${fmt(pts.length)}개</b> + 바닥신호등 <b>${fmt(cross.length)}개</b>를 실거리 지도에 올렸습니다. <b style="color:#fdba74">어두운(조명 사각) 영역이 여성안심길·안심계단 개선 1순위 후보</b>입니다(☎5838). 밝을수록 조명이 촘촘. ※ 가로등(OA-22205)은 관리 대상 도로 위주의 부분 집합이라, 동별 성범죄·범죄주의구간(15101797)과 겹치면 후보지가 더 또렷해집니다.`;
+  document.getElementById("guardN").textContent=`${fmt(guard.length)}개`;
+  document.getElementById("delivN").textContent=`${fmt(deliv.length)}개`;
+  document.getElementById("lampDesc").innerHTML=`강남구 일대 가로등 <b>${fmt(pts.length)}개</b> · 바닥신호등 <b>${fmt(cross.length)}개</b> 위에, <b style="color:#22d3ee">여성안심지킴이집 ${fmt(guard.length)}개</b>·<b style="color:#f472b6">안심택배함 ${fmt(deliv.length)}개</b>(가족정책과 직접 소관)를 겹쳤습니다. <b style="color:#fdba74">어두운(조명 사각)이면서 안심 인프라 마커도 없는 영역이 여성안심길·지킴이집·택배함 확충 1순위 후보</b>입니다(☎5838·5814). ※ 가로등(OA-22205)은 관리도로 위주 부분집합이라, 동별 성범죄·범죄주의구간(15101797)을 얹으면 후보지가 더 또렷해집니다.`;
   if(typeof L==="undefined"){document.getElementById("lampDesc").textContent+=" (지도 라이브러리 로드 실패 — 인터넷 연결 필요)";return;}
   const map=L.map("lampMap",{zoomControl:true,attributionControl:true,scrollWheelZoom:false});
   L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
@@ -400,6 +404,12 @@ new Chart(document.getElementById("nationPlaceChart"),{
      gradient:{0.2:"#6d28d9",0.45:"#d97706",0.7:"#f59e0b",1:"#fde68a"}}).addTo(map);
   cross.forEach(p=>L.circleMarker([p[0],p[1]],
     {radius:4,color:"#064e3b",weight:1,fillColor:"#34d399",fillOpacity:.95}).addTo(map));
+  guard.forEach(p=>L.circleMarker([p[0],p[1]],
+    {radius:5,color:"#0e7490",weight:1.5,fillColor:"#22d3ee",fillOpacity:.95}).addTo(map)
+    .bindTooltip(`🛡️ 여성안심지킴이집<br>${p[2]||""}`,{direction:"top"}));
+  deliv.forEach(p=>L.circleMarker([p[0],p[1]],
+    {radius:7,color:"#9d174d",weight:1.5,fillColor:"#f472b6",fillOpacity:.95}).addTo(map)
+    .bindTooltip(`📦 안심택배함<br>${p[2]||""}`,{direction:"top"}));
   const bounds=L.latLngBounds(pts.map(p=>[p[0],p[1]]));
   map.fitBounds(bounds,{padding:[20,20]});
   setTimeout(()=>map.invalidateSize(),200);
